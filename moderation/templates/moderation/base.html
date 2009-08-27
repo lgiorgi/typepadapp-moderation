@@ -1,0 +1,49 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:at="http://www.sixapart.com/ns/at" id="sixapart-standard">
+<head>
+    <title>{% block title %}{% trans "Moderation" %} for {{ request.group.display_name }}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ settings.media_url }}typepadapp/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="/moderation/static/css/moderation.css" />
+</head>
+
+<body>
+    <div id="header">
+        <h1><a href="">{% trans "Moderation" %} for {{ request.group.display_name }}</a></h1>
+    </div>
+    <div id="container">
+        <div id="container-inner">
+            {% include "motion/bits/flash.html" %}
+            <div id="content">
+                <div class="content-nav col">
+                <ul>
+                    <li class="selected"><a href="">Moderation Queue</a></li>
+                    <li><a href="">Flagged Posts</a></li>
+                </ul>
+                </div>
+                <div class="content-main col">
+                    <table cellspacing="0">
+                    <tr class="item">
+                        <td class="item-checkbox">
+                            <input class="select cb" type="checkbox" value="" name="id"/>
+                        </td>
+                        <td><div class="type-icon link-icon"></div></td>
+                        <td class="item-body">
+                        Everything you'd expect from the respective MCs is here, Drake spitting about his internet hype, Kanye dropping pop culture references, Wayne calling himself a Martian, and Em threatening to eat someone's face. Ye and Drake have worked together before, with Mr. West directing the music video for Drake's "Best I Ever
+                        </td>
+                        <td>
+                            <a class="action approve" href="">Approve</a>
+                            <a class="action delete" href="">Delete</a>
+                        </td>
+                    </tr>
+                    </table>
+                </div>
+            </div><!-- end #content -->
+
+        </div><!-- end #container-inner -->
+    </div><!-- end #container -->
+
+</body>
+</html>
