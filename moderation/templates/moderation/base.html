@@ -18,12 +18,12 @@
             {% include "motion/bits/flash.html" %}
             <div id="content">
                 <div class="content-nav col">
-                    {% block content-nav %}
+                    {% url pending as pending_url %}
+                    {% url flagged as flagged_url %}
                     <ul>
-                        <li class="selected"><a href="{% url pending %}">Awaiting Moderation</a></li>
-                        <li><a href="{% url flagged %}">Flagged Posts</a></li>
+                        <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{% url pending %}">Awaiting Moderation</a></li>
+                        <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">Flagged Posts</a></li>
                     </ul>
-                    {% endblock %}
                 </div>
                 <div class="content-main col">
                 {% block content-main %}{% endblock %}
