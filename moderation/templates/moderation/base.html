@@ -18,9 +18,11 @@
             {% include "motion/bits/flash.html" %}
             <div id="content">
                 <div class="content-nav col">
+                    {% url dashboard as dashboard_url %}
                     {% url pending as pending_url %}
                     {% url flagged as flagged_url %}
                     <ul>
+                        <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{% url dashboard %}">Dashboard</a></li>
                         <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{% url pending %}">Awaiting Moderation</a></li>
                         <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">Flagged Posts</a></li>
                     </ul>
