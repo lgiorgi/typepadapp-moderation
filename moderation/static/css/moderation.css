@@ -25,6 +25,12 @@ h1 {
 #header a:hover, #header a:active {
     text-decoration: none;
 }
+#header .nav-links {
+    float: right;
+}
+#header .nav-links a {
+    margin-left: 10px;
+}
 #container {
     padding: 20px 40px;
 }
