@@ -1,1 +1,53 @@
 {% extends "moderation/base.html" %}
+
+{% block content-main %}
+<table cellspacing="0">
+    <tr class="header">
+        <td colspan="5">
+            Flagged Posts (2 posts)
+        </td>
+    </tr>
+    <tr class="item">
+        <td class="item-checkbox">
+            <input class="select cb" type="checkbox" value="" name="id"/>
+        </td>
+        <td><a href="" title="Who flagged this?">4 flags</a></td>
+        <td><div class="type-icon link-icon"></div></td>
+        <td class="item-body">
+        <div><a href="">Leah</a> says:</div>
+        Everything you'd expect from the respective MCs is here, Drake spitting about his internet hype, Kanye dropping pop culture references, Wayne calling himself a Martian, and Em threatening to eat someone's face. Ye and Drake have worked together before, with Mr. West directing the music video for Drake's "Best I Ever
+        </td>
+        <td>
+            <a class="action delete" href="">Delete</a>
+            <a class="action ban" href="">Ban User</a>
+            <a class="action approve" href="">Remove Flags</a>
+        </td>
+    </tr>
+    <tr class="item">
+        <td class="item-checkbox">
+            <input class="select cb" type="checkbox" value="" name="id"/>
+        </td>
+        <td><a href="" title="Who flagged this?">4 flags</a></td>
+        <td><div class="type-icon link-icon"></div></td>
+        <td class="item-body">
+        <div><a href="">Leah</a> says:</div>
+        Everything you'd expect from the respective MCs is here, Drake spitting about his internet hype, Kanye dropping pop culture references, Wayne calling himself a Martian, and Em threatening to eat someone's face. Ye and Drake have worked together before, with Mr. West directing the music video for Drake's "Best I Ever
+        </td>
+        <td>
+            <a class="action delete" href="">Delete</a>
+            <a class="action ban" href="">Ban User</a>
+            <a class="action approve" href="">Remove Flags</a>
+        </td>
+    </tr>
+    <tr class="footer">
+        <td class="item-checkbox">
+            <input type="checkbox" />
+        </td>
+        <td colspan="4">
+            <a class="action delete" href="">Delete</a>
+            <a class="action ban" href="">Ban User</a>
+            <a class="action approve" href="">Remove Flags</a>
+        </td>
+    </tr>
+</table>
+{% endblock %}
