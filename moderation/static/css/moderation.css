@@ -87,6 +87,9 @@ a.action {
 .delete {
     background-color: #C75C6A;
 }
+.ban {
+    background-color: #EFE14A;
+}
 td {
     padding: 6px;
 }
