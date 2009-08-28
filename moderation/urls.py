@@ -7,6 +7,8 @@ media_dir = os.path.join(app_path, 'static')
 
 urlpatterns = patterns('moderation.views',
     url(r'^/?$', 'ModerationView', name='moderation'),
+    url(r'^/pending/?$', 'PendingView', name='pending'),
+    url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
 )
 urlpatterns += patterns('',
     url(r'^/static/(?P<path>.*)/?$', 'django.views.static.serve',
