@@ -15,7 +15,7 @@
             <a href="{% url home %}">{% trans "Return to" %} {{ request.group.display_name }}</a>
             <a href="{% url logout %}">{% trans "Sign out" %}</a>
         </div>
-        <h1><a href="">{% trans "Moderation for" %} {{ request.group.display_name }}</a></h1>
+        <h1><a href="{% url dashboard %}">{% trans "Moderation for" %} {{ request.group.display_name }}</a></h1>
     </div>
     <div id="container">
         <div id="container-inner">
