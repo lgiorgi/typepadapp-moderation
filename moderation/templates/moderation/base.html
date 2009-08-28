@@ -26,9 +26,9 @@
                     {% url pending as pending_url %}
                     {% url flagged as flagged_url %}
                     <ul>
-                        <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{% url dashboard %}">Dashboard</a></li>
-                        <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{% url pending %}">Awaiting Moderation</a></li>
-                        <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">Flagged Posts</a></li>
+                        <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{% url dashboard %}">{% trans "Dashboard" %}</a></li>
+                        <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{% url pending %}">{% trans "Awaiting Moderation" %}</a></li>
+                        <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">{% trans "Flagged Posts" %}</a></li>
                     </ul>
                 </div>
                 <div class="content-main col">
