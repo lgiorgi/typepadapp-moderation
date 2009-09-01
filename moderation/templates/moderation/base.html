@@ -6,7 +6,6 @@
 <head>
     <title>{% block title %}{% trans "Moderation" %} for {{ request.group.display_name }}{% endblock %}</title>
 
-    <link rel="stylesheet" type="text/css" href="{{ settings.media_url }}typepadapp/css/reset.css" />
     <link rel="stylesheet" type="text/css" href="/moderation{{ settings.media_url }}css/moderation.css" />
 
     <script type="text/javascript" src="{{ settings.media_url }}typepadapp/js/jquery.js"></script>
@@ -28,7 +27,7 @@
     </div>
     <div id="container">
         <div id="container-inner">
-            {% include "motion/bits/flash.html" %}
+            <div id="flash-notice" class="flash notice" onclick="$(this).fadeOut();" style="display: none;"></div>
             <div id="content">
                 <div class="content-nav col">
                     {% url dashboard as dashboard_url %}

@@ -1,3 +1,6 @@
+@import url(../../../../static/typepadapp/css/reset.css);
+@import url(../../../../static/typepadapp/css/flash.css);
+
 body {
     color: #333;
     font-family: Helvetica,Arial,Verdana,sans-serif;

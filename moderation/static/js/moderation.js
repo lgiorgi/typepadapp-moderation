@@ -12,7 +12,6 @@ function moderate(id, action) {
         url: settings.moderate_url,
         data: {"asset_id": asset_id, "action": action},
         success: function(data){
-            alert('success: ' + data)
             $("#loader-" + asset_id).toggle()
             // decrement asset count
             var count = parseInt($('#asset-count').html());
@@ -26,6 +25,9 @@ function moderate(id, action) {
                 $('#assets-empty').toggle()
                 $('#assets-footer').toggle()
             }
+            // show flash
+            $('#flash-notice').html(''+data)
+            $('#flash-notice').toggle()
         },
         error: function(xhr, txtStatus, errorThrown) {
             alert('An error occurred: ' + xhr.status + ' -- ' + xhr.statusText);
