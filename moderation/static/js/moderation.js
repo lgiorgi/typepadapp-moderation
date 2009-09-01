@@ -22,7 +22,10 @@ function moderate(id, action) {
                 count--;
             $('#asset-count').html(''+count)
             // show message if no assets left
-            if (!count) $('#assets-empty').toggle()
+            if (!count) {
+                $('#assets-empty').toggle()
+                $('#assets-footer').toggle()
+            }
         },
         error: function(xhr, txtStatus, errorThrown) {
             alert('An error occurred: ' + xhr.status + ' -- ' + xhr.statusText);
