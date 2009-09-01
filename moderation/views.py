@@ -1,11 +1,11 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user
 
 import typepad
 from typepadapp.views.base import TypePadView
-from moderation.models import Asset, Flag, AssetContent
+from moderation.models import Asset, Flag, AssetContent, Blacklist, IPBlock
 from typepadapp.decorators import ajax_required
 
 import simplejson as json
@@ -113,11 +113,38 @@ def browser_upload(request):
     user = get_user(request)
     typepad.client.complete_batch()
 
+    if not user.is_authenticated():
+        return HttpResponseForbidden("invalid request")
+
     ip = request.META['REMOTE_ADDR']
 
-    # handle a file post
-    data = json.loads(request.POST['asset'])
-    tp_asset = typepad.Asset.from_dict(data)
+
+    # check for user/ip blocks
+    blacklisted = Blacklist.objects.filter(user_id=user.url_id)
+    ipblocked = IPBlock.objects.filter(ip_addr=ip)
+
+    if (blacklisted and blacklisted.block) \
+        or (ipblocked and ipblocked.block):
+        return HttpResponseForbidden("Sorry, you are not allowed to post.")
+
+
+    if request.FILES:
+        data = json.loads(request.POST['asset'])
+        tp_asset = typepad.Asset.from_dict(data)
+    else:
+        # some server-side validation
+        # non-file post
+        from motion import forms
+        form = forms.PostForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            tp_asset = form.save()
+        else:
+            request.flash.add('errors', _('Please correct the errors below.'))
+            return HttpResponseRedirect(request.path)
+
+
+    # save a copy of this content to our database
 
     asset = Asset()
     asset.asset_type = tp_asset.type_id
@@ -129,8 +156,9 @@ def browser_upload(request):
 
     content = AssetContent()
     content.asset = asset
-    content.data = request.POST['asset']
-    content.attachment = request.FILES['file']
+    content.data = json.dumps(tp_asset.to_dict())
+    if request.FILES:
+        content.attachment = request.FILES['file']
     content.user_token = str(request.oauth_client.token)
     content.ip_addr = ip
     content.save()

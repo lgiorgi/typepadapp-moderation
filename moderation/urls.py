@@ -11,6 +11,7 @@ urlpatterns = patterns('moderation.views',
     url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
     url(r'^/report$', 'moderation_report', name='moderation_report'),
     url(r'^/upload$', 'browser_upload', name='upload_url'),
+    url(r'^/upload$', 'browser_upload', name='motion_post_url'),
 )
 urlpatterns += patterns('moderation.ajax',
     url(r'^/ajax/moderate/?$', 'moderate', name='moderate'),
