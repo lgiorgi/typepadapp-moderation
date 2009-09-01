@@ -1,4 +1,5 @@
 from typepadapp.views.base import TypePadView
+from moderation.models import Asset
 
 
 class DashboardView(TypePadView):
@@ -13,12 +14,15 @@ class DashboardView(TypePadView):
 
 class PendingView(TypePadView):
     """
-    Moderation home page.
+    Moderation queue of every new post, pending approval.
     """
 
+    template_name = "moderation/pending.html"
     admin_required = True
 
-    template_name = "moderation/pending.html"
+    def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
+        assets = Asset.objects.filter(status=1)
+        self.context.update(locals())
 
 
 class FlaggedView(TypePadView):
