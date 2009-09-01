@@ -9,9 +9,7 @@ urlpatterns = patterns('moderation.views',
     url(r'^/?$', 'DashboardView', name='dashboard'),
     url(r'^/pending/?$', 'PendingView', name='pending'),
     url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
-)
-urlpatterns += patterns('moderation.ajax',
-    url(r'^/ajax/moderate/?$', 'moderate', name='moderate'),
+    url(r'^/report$', 'moderation_report', name='moderation_report'),
 )
 urlpatterns += patterns('',
     url(r'^/static/(?P<path>.*)/?$', 'django.views.static.serve',

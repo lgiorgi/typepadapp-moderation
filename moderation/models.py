@@ -86,7 +86,7 @@ class Flag(models.Model):
     user_id = models.CharField(max_length=35)
     """TypePad user id of the user reporting this asset."""
 
-    reason_code = models.PositiveSmallIntegerField()
+    reason_code = models.PositiveSmallIntegerField(default=0)
     """Category code of report."""
 
     ts = models.DateTimeField(auto_now_add=True)

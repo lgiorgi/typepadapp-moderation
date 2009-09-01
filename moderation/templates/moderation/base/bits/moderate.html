@@ -1,0 +1,5 @@
+{% load i18n %}
+<form id="flag-{{ entry.url_id }}" method="GET" action="">
+    <button class="button-flag" onclick="flagasset('{{ entry.url_id }}'); return false;">{% trans "Flag" %}
+    </button>
+</form>

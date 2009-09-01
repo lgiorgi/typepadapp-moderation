@@ -1,0 +1,39 @@
+<div style="display:none">
+<div id="flag-dialog" title="Flag this post">
+    <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}">
+        <input type="hidden" id="flag-dialog-asset-id" name="asset-id" value="" />
+        <ul>
+            <select name="reason">
+                <option value="">Select one...</option>
+                <option value="1">sexual content</option>
+                <option value="2">violent material</option>
+                <option value="3">copyrighted material</option>
+                <option value="4">hateful or abusive</option>
+                <option value="5">harmful or dangerous acts</option>
+                <option value="6">child abuse</option>
+                <option value="7">spam</option>
+                <option value="8">this is illegal</option>
+                <option value="9">violates my privacy</option>
+            </select>
+        </ul>
+    </form>
+</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#flag-dialog").dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            buttons: {
+                "Flag": function() { $("#flag-dialog-form").submit(); },
+                "Cancel": function() { $(this).dialog("close"); }
+            }
+        });
+    });
+    function flagasset(xid) {
+        $("#flag-dialog-asset-id").val(xid);
+        $("#flag-dialog").dialog('open');
+    }
+</script>
