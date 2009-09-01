@@ -1,11 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user
 
 import typepad
 from typepadapp.views.base import TypePadView
-from moderation.models import Asset, Flag
+from moderation.models import Asset, Flag, AssetContent
 from typepadapp.decorators import ajax_required
 
+import simplejson as json
 from datetime import datetime
 
 
@@ -43,8 +46,6 @@ class FlaggedView(TypePadView):
 
 
 def moderation_report(request):
-    from django.contrib.auth import get_user
-
     asset_id = request.POST['asset-id']
     reason_code = request.POST.get('reason', None)
 
@@ -69,12 +70,14 @@ def moderation_report(request):
         local_asset.summary = unicode(asset)
         local_asset.asset_type = asset.type_id
         local_asset.user_id = asset.user.url_id
+        local_asset.user_display_name = asset.user.display_name
         local_asset.flag_count = 1
         local_asset.status = Asset.FLAGGED
         local_asset.last_flagged = datetime.now()
     else:
         local_asset = local_asset[0]
         local_asset.flag_count += 1
+    local_asset.save()
 
     flag = Flag.objects.filter(user_id=request.user.url_id, asset=local_asset)
     if not flag:
@@ -86,7 +89,6 @@ def moderation_report(request):
             flag.reason_code = reason_code
         flag.ip_addr = ip
         flag.save()
-        local_asset.save()
     else:
         flag = flag[0]
         if reason_code and flag.reason_code != reason_code:
@@ -99,3 +101,39 @@ def moderation_report(request):
     else:
         request.flash.add('notices', _('Thank you for your report.'))
         return HttpResponseRedirect(asset.get_absolute_url())
+
+
+def browser_upload(request):
+    if not request.method == 'POST':
+        url = reverse('upload_url')
+        url = 'for(;;);%s' % url # no third party sites allowed.
+        return HttpResponse(url)
+
+    typepad.client.batch_request()
+    user = get_user(request)
+    typepad.client.complete_batch()
+
+    ip = request.META['REMOTE_ADDR']
+
+    # handle a file post
+    data = json.loads(request.POST['asset'])
+    tp_asset = typepad.Asset.from_dict(data)
+
+    asset = Asset()
+    asset.asset_type = tp_asset.type_id
+    asset.user_id = user.url_id
+    asset.user_display_name = user.display_name
+    asset.summary = unicode(tp_asset)
+    asset.status = Asset.MODERATED
+    asset.save()
+
+    content = AssetContent()
+    content.asset = asset
+    content.data = request.POST['asset']
+    content.attachment = request.FILES['file']
+    content.user_token = str(request.oauth_client.token)
+    content.ip_addr = ip
+    content.save()
+
+    request.flash.add('notices', _('Thank you for your submission. It is awaiting moderation.'))
+    return HttpResponseRedirect(reverse('home'))

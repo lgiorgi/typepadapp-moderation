@@ -19,7 +19,10 @@ class Asset(models.Model):
     user_id = models.CharField(max_length=35)
     """TypePad user id of the asset owner."""
 
-    asset_id = models.CharField(max_length=35, unique=True, null=True)
+    user_display_name = models.CharField(max_length=255)
+    """The name of the asset owner."""
+
+    asset_id = models.CharField(max_length=35, null=True)
     """TypePad ID (for flagged assets only)."""
 
     asset_type = models.CharField(verbose_name="Asset Type", max_length=20,
@@ -71,7 +74,7 @@ class AssetContent(models.Model):
     ip_addr = models.IPAddressField()
     """IP address of user who posted asset."""
 
-    user_token = models.CharField(max_length=50, blank=False)
+    user_token = models.CharField(max_length=255, blank=False)
     """Copy of OAuth token of user who posted asset (for re-posting to TypePad)."""
 
 
