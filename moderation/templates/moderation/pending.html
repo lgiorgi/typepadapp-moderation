@@ -1,4 +1,5 @@
 {% extends "moderation/base.html" %}
+{% load i18n %}
 
 {% block content-main %}
 <table cellspacing="0">
@@ -25,11 +26,16 @@
         </td>
     </tr>
     <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
-        <td class="loader" colspan="4">
+        <td class="info" colspan="4">
             <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
     </tr>
     {% endfor %}
+    <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
+        <td class="info" colspan="4">
+            {% trans "There are no posts awaiting moderation." %}
+        </td>
+    </tr>
     <tr class="footer">
         <td class="item-checkbox">
             <input type="checkbox" />

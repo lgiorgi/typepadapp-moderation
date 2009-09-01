@@ -119,7 +119,7 @@ tr.header {
 tr.header, tr.footer {
     background-color: #D5EBF8;
 }
-td.loader {
+td.info {
     text-align: center;
     padding: 20px 0;
 }

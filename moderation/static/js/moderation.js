@@ -21,6 +21,8 @@ function moderate(id, action) {
             else
                 count--;
             $('#asset-count').html(''+count)
+            // show message if no assets left
+            if (!count) $('#assets-empty').toggle()
         },
         error: function(xhr, txtStatus, errorThrown) {
             alert('An error occurred: ' + xhr.status + ' -- ' + xhr.statusText);
