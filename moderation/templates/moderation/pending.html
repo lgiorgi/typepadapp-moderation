@@ -4,7 +4,7 @@
 <table cellspacing="0">
     <tr class="header">
         <td colspan="4">
-            Awaiting Moderation ({{ assets.count }} post{{ assets.count|pluralize }})
+            Awaiting Moderation (<span id="asset-count">{{ assets.count }}</span>)
         </td>
     </tr>
     {% for asset in assets %}

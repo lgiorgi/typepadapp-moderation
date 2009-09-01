@@ -14,6 +14,13 @@ function moderate(id, action) {
         success: function(data){
             alert('success: ' + data)
             $("#loader-" + asset_id).toggle()
+            // decrement asset count
+            var count = parseInt($('#asset-count').html());
+            if (isNaN(count))
+                count = 0;
+            else
+                count--;
+            $('#asset-count').html(''+count)
         },
         error: function(xhr, txtStatus, errorThrown) {
             alert('An error occurred: ' + xhr.status + ' -- ' + xhr.statusText);
