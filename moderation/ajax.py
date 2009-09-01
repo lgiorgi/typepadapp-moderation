@@ -30,5 +30,6 @@ def moderate(request):
     elif action == 'delete':
         # outright delete it?? or do we have a status for this?
         asset.delete()
+        res = 'Post deleted.'
 
     return http.HttpResponse(res)
