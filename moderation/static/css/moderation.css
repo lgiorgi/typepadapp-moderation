@@ -57,9 +57,7 @@ h1 {
     color: #222;
 }
 .content-main {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    background-color: #FFF;
+    width: 100%;
 }
 .item-checkbox {
     width: 14px;
@@ -76,8 +74,14 @@ h1 {
 .photo-icon {
     background-position: -33px -65px;
 }
+.item-icon {
+    width: 32px;
+}
+.item-actions {
+    width: 160px;
+}
 .item-body {
-    width: 400px;
+    width: auto;
 }
 /* action buttons */
 a.action {
@@ -96,6 +100,11 @@ a.action {
 .ban {
     background-color: #EFE14A;
 }
+/* table */
+table {
+    width: 80%;
+    background-color: #FFF;
+}
 td {
     padding: 6px;
 }
@@ -109,4 +118,8 @@ tr.header {
 }
 tr.header, tr.footer {
     background-color: #D5EBF8;
+}
+td.loader {
+    text-align: center;
+    padding: 20px 0;
 }

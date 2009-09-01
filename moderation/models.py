@@ -19,7 +19,7 @@ class Asset(models.Model):
     user_id = models.CharField(max_length=35)
     """TypePad user id of the asset owner."""
 
-    asset_id = models.CharField(max_length=35, unique=True)
+    asset_id = models.CharField(max_length=35, unique=True, null=True)
     """TypePad ID (for flagged assets only)."""
 
     asset_type = models.CharField(verbose_name="Asset Type", max_length=20,

@@ -5,8 +5,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:at="http://www.sixapart.com/ns/at" id="sixapart-standard">
 <head>
     <title>{% block title %}{% trans "Moderation" %} for {{ request.group.display_name }}{% endblock %}</title>
+
     <link rel="stylesheet" type="text/css" href="{{ settings.media_url }}typepadapp/css/reset.css" />
     <link rel="stylesheet" type="text/css" href="/moderation{{ settings.media_url }}css/moderation.css" />
+
+    <script type="text/javascript" src="{{ settings.media_url }}typepadapp/js/jquery.js"></script>
+    <script type="text/javascript" src="/moderation{{ settings.media_url }}js/moderation.js"></script>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        settings.moderate_url = '{% url moderate %}';
+        /* ]]> */
+    </script>
 </head>
 
 <body>
@@ -31,7 +40,7 @@
                         <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">{% trans "Flagged Posts" %}</a></li>
                     </ul>
                 </div>
-                <div class="content-main col">
+                <div class="content-main">
                 {% block content-main %}{% endblock %}
                 </div>
             </div><!-- end #content -->

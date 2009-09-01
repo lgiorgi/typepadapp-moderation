@@ -10,6 +10,9 @@ urlpatterns = patterns('moderation.views',
     url(r'^/pending/?$', 'PendingView', name='pending'),
     url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
 )
+urlpatterns += patterns('moderation.ajax',
+    url(r'^/ajax/moderate/?$', 'moderate', name='moderate'),
+)
 urlpatterns += patterns('',
     url(r'^/static/(?P<path>.*)/?$', 'django.views.static.serve',
         kwargs={ 'document_root': media_dir }),
