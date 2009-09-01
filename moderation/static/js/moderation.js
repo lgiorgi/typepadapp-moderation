@@ -28,4 +28,10 @@ $(document).ready(function () {
         moderate($(this).attr('id'), 'approve');
         return false;
     });
+    $('.delete').click(function() {
+        if (confirm('Are you sure you want to delete this post?')) {
+            moderate($(this).attr('id'), 'delete');
+        }
+        return false;
+    });
 })

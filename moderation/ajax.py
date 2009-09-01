@@ -22,9 +22,13 @@ def moderate(request):
     asset = Asset.objects.get(id=asset_id)
 
     action = request.POST.get('action', 'approve')
+    print 'action:', action
     if action == 'approve':
         asset.status = 4
         asset.save()
         res = 'Post approved.'
+    elif action == 'delete':
+        # outright delete it?? or do we have a status for this?
+        asset.delete()
 
     return http.HttpResponse(res)
