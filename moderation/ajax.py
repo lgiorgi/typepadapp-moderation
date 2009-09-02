@@ -31,7 +31,7 @@ def moderate(request):
 
     action = request.POST.get('action', 'approve')
     if action == 'approve':
-        if asset.status == Asset.FLAGGED:
+        if asset.status in [Asset.FLAGGED, Asset.SUPPRESSED]:
             # clear any flags too while we're at it
             Flag.objects.filter(asset=asset).delete()
             # leaving the asset as approved prevents it from being
