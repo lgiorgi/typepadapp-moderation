@@ -8,15 +8,9 @@
             <ul>
                 <select name="reason">
                     <option value="">Select one...</option>
-                    <option value="1">sexual content</option>
-                    <option value="2">violent material</option>
-                    <option value="3">copyrighted material</option>
-                    <option value="4">hateful or abusive</option>
-                    <option value="5">harmful or dangerous acts</option>
-                    <option value="6">child abuse</option>
-                    <option value="7">spam</option>
-                    <option value="8">this is illegal</option>
-                    <option value="9">violates my privacy</option>
+                    {% for option in settings.report_options %}
+                    <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
+                    {% endfor %}
                 </select>
             </ul>
         </fieldset>
