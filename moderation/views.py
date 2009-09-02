@@ -45,7 +45,7 @@ class FlaggedView(TypePadView):
     template_name = "moderation/flagged.html"
 
     def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
-        assets = Asset.objects.filter(status=Asset.FLAGGED)
+        assets = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED])
         self.context.update(locals())
 
 
