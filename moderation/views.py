@@ -84,12 +84,13 @@ def moderation_report(request):
         local_asset.flag_count += 1
     local_asset.save()
 
-    flag = Flag.objects.filter(user_id=request.user.url_id, asset=local_asset)
+    flag = Flag.objects.filter(user_id=user.url_id, asset=local_asset)
     if not flag:
         # lets not allow a single user to repeat a report on the same asset
         flag = Flag()
         flag.asset = local_asset
-        flag.user_id = request.user.url_id
+        flag.tp_asset_id = asset_id
+        flag.user_id = user.url_id
         if reason_code is not None:
             flag.reason_code = reason_code
         if note is not None:

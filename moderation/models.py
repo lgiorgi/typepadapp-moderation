@@ -92,6 +92,9 @@ class Flag(models.Model):
     asset = models.ForeignKey(Asset, db_index=True)
     """Reference to parent Asset object."""
 
+    tp_asset_id = models.CharField(max_length=35)
+    """TypePad asset ID. 'asset_id' is the reference to the local asset."""
+
     user_id = models.CharField(max_length=35)
     """TypePad user id of the user reporting this asset."""
 
