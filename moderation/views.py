@@ -168,7 +168,7 @@ def browser_upload(request):
     content.data = json.dumps(tp_asset.to_dict())
     if request.FILES:
         content.attachment = request.FILES['file']
-    content.user_token = str(request.oauth_client.token)
+    content.user_token = request.oauth_client.token.to_string()
     content.ip_addr = ip
     content.save()
 
