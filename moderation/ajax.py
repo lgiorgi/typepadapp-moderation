@@ -17,7 +17,7 @@ from oauth import oauth
 @ajax_required
 def moderate(request):
     """
-    Add this item to the user's favorites. Return OK.
+    Moderation actions for the moderation queue. Approve or delete. Return OK.
     """
     res = 'OK'
 
