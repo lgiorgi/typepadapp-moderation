@@ -1,6 +1,8 @@
 {% load i18n %}
+{% if not moderator_approved %}
 <form id="flag-{{ entry.url_id }}" method="GET" action="">
     <button class="button-flag {% if user_flags %}flagged{% endif %}"
         onclick="{% if not user_flags %}flagasset('{{ entry.url_id }}'); {% endif %}return false;">{% trans "Flag" %}
     </button>
 </form>
+{% endif %}
