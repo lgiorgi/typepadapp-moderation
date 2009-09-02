@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidde
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user
+from django.conf import settings
 
 import typepad
 from typepadapp.views.base import TypePadView
@@ -51,7 +52,7 @@ class FlaggedView(TypePadView):
 
 def moderation_report(request):
     asset_id = request.POST['asset-id']
-    reason_code = request.POST.get('reason', None)
+    reason_code = int(request.POST.get('reason', 0))
     note = request.POST.get('note', None)
 
     ip = request.META['REMOTE_ADDR']
@@ -82,6 +83,23 @@ def moderation_report(request):
     else:
         local_asset = local_asset[0]
         local_asset.flag_count += 1
+
+
+    if local_asset.status == Asset.APPROVED:
+        request.flash.add('notices', _('This post has been approved by the site moderator.'))
+        return HttpResponseRedirect(asset.get_absolute_url())
+
+
+    # determine if this report is going to suppress the asset or not.
+    if local_asset.status != Asset.SUPPRESSED:
+        # count # of flags for this reason and asset:
+        if len(settings.REPORT_OPTIONS[reason_code]) > 1:
+            trigger = settings.REPORT_OPTIONS[reason_code][1]
+            count = Flag.objects.filter(tp_asset_id=asset_id, reason_code=reason_code).count()
+            if count + 1 >= trigger:
+                local_asset.status = Asset.SUPPRESSED
+
+
     local_asset.save()
 
     flag = Flag.objects.filter(user_id=user.url_id, asset=local_asset)
@@ -105,6 +123,9 @@ def moderation_report(request):
             if note is not None:
                 flag.note = note
             flag.save()
+
+
+
 
     if request.is_ajax():
         return HttpRepsonse('OK', mimetype='text/plain')
