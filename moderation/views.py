@@ -48,6 +48,7 @@ class FlaggedView(TypePadView):
 def moderation_report(request):
     asset_id = request.POST['asset-id']
     reason_code = request.POST.get('reason', None)
+    note = request.POST.get('note', None)
 
     ip = request.META['REMOTE_ADDR']
 
@@ -87,6 +88,8 @@ def moderation_report(request):
         flag.user_id = request.user.url_id
         if reason_code is not None:
             flag.reason_code = reason_code
+        if note is not None:
+            flag.note = note
         flag.ip_addr = ip
         flag.save()
     else:
@@ -94,6 +97,8 @@ def moderation_report(request):
         if reason_code and flag.reason_code != reason_code:
             flag.reason_code = reason_code
             flag.ip_addr = ip
+            if note is not None:
+                flag.note = note
             flag.save()
 
     if request.is_ajax():

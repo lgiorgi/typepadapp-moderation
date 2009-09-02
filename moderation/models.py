@@ -57,6 +57,12 @@ class Asset(models.Model):
         except KeyError:
             return None
 
+    # def approve(self):
+    #     content = AssetContent.objects.get(asset=self)
+    #     if content:
+    #         asset = typepad.Asset.from_dict(content.data)
+    #         if content.attachment: # whoa, file upload!
+
 
 class AssetContent(models.Model):
     """Table to store original post data that will be posted to
@@ -91,6 +97,9 @@ class Flag(models.Model):
 
     reason_code = models.PositiveSmallIntegerField(default=0)
     """Category code of report."""
+
+    note = models.CharField(max_length=255, blank=True, null=True)
+    """A field for a user-supplied note."""
 
     ts = models.DateTimeField(auto_now_add=True)
     """Timestamp of report."""

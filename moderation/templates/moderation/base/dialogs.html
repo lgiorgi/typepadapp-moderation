@@ -1,21 +1,33 @@
 <div style="display:none">
 <div id="flag-dialog" title="Flag this post">
-    <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}">
+    <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}" style="width: 400px">
         <input type="hidden" id="flag-dialog-asset-id" name="asset-id" value="" />
-        <ul>
-            <select name="reason">
-                <option value="">Select one...</option>
-                <option value="1">sexual content</option>
-                <option value="2">violent material</option>
-                <option value="3">copyrighted material</option>
-                <option value="4">hateful or abusive</option>
-                <option value="5">harmful or dangerous acts</option>
-                <option value="6">child abuse</option>
-                <option value="7">spam</option>
-                <option value="8">this is illegal</option>
-                <option value="9">violates my privacy</option>
-            </select>
-        </ul>
+        <fieldset>
+            <p>Please select a category that most closely reflects your
+            concern about this post.</p>
+            <ul>
+                <select name="reason">
+                    <option value="">Select one...</option>
+                    <option value="1">sexual content</option>
+                    <option value="2">violent material</option>
+                    <option value="3">copyrighted material</option>
+                    <option value="4">hateful or abusive</option>
+                    <option value="5">harmful or dangerous acts</option>
+                    <option value="6">child abuse</option>
+                    <option value="7">spam</option>
+                    <option value="8">this is illegal</option>
+                    <option value="9">violates my privacy</option>
+                </select>
+            </ul>
+        </fieldset>
+        <fieldset>
+            <label for="flag-dialog-note">Note for moderator:</label>
+            <input id="flag-dialog-note" name="note" type="text" maxlength="140" />
+        </fieldset>
+        <p>Our moderator will review your request and determine if it
+        violates any of our guidelines or is inappropriate. Abusing this
+        feature may results in your account being permanently banned from this
+        site.</p>
     </form>
 </div>
 </div>
@@ -26,6 +38,8 @@
             modal: true,
             autoOpen: false,
             resizable: false,
+            width: 420,
+            height: 220,
             buttons: {
                 "Flag": function() { $("#flag-dialog-form").submit(); },
                 "Cancel": function() { $(this).dialog("close"); }
