@@ -1,44 +1,40 @@
 {% extends "moderation/base.html" %}
+{% load i18n %}
 
 {% block content-main %}
 <table cellspacing="0">
     <tr class="header">
         <td colspan="5">
-            Flagged Posts (2 posts)
+            Flagged Posts (<span id="asset-count">{{ assets.count }}</span>)
         </td>
     </tr>
-    <tr class="item">
+    {% for asset in assets %}
+    <tr id="item-{{ asset.id }}" class="item">
         <td class="item-checkbox">
             <input class="select cb" type="checkbox" value="" name="id"/>
         </td>
-        <td><a href="" title="Who flagged this?">4 flags</a></td>
-        <td><div class="type-icon link-icon"></div></td>
+        <td><a href="#" title="Who flagged this?">{{ asset.flag_count }} flags</a></td>
+        <td class="item-icon"><div class="type-icon {{ asset.asset_type }}-icon"></div></td>
         <td class="item-body">
-            <div><a href="">Leah</a> says:</div>
-            Everything you'd expect from the respective MCs is here, Drake spitting about his internet hype, Kanye dropping pop culture references, Wayne calling himself a Martian, and Em threatening to eat someone's face. Ye and Drake have worked together before, with Mr. West directing the music video for Drake's "Best I Ever
+            <div><a href="#">{{ asset.user_display_name }}</a> says:</div>
+            {{ asset.summary }}
             <div><a href="">View full post</a></div>
         </td>
-        <td>
-            <a class="action delete" href="">Delete</a>
+        <td class="item-actions">
+            <a id="delete-{{ asset.id }}" class="action delete" href="">Delete</a>
             <a class="action ban" href="">Ban User</a>
-            <a class="action approve" href="">Remove Flags</a>
+            <a id="approve-{{ asset.id }}" class="action approve" href="">Remove Flags</a>
         </td>
     </tr>
-    <tr class="item">
-        <td class="item-checkbox">
-            <input class="select cb" type="checkbox" value="" name="id"/>
+    <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
+        <td class="info" colspan="4">
+            <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
-        <td><a href="" title="Who flagged this?">4 flags</a></td>
-        <td><div class="type-icon link-icon"></div></td>
-        <td class="item-body">
-            <div><a href="">Leah</a> says:</div>
-            Everything you'd expect from the respective MCs is here, Drake spitting about his internet hype, Kanye dropping pop culture references, Wayne calling himself a Martian, and Em threatening to eat someone's face. Ye and Drake have worked together before, with Mr. West directing the music video for Drake's "Best I Ever
-            <div><a href="">View full post</a></div>
-        </td>
-        <td>
-            <a class="action delete" href="">Delete</a>
-            <a class="action ban" href="">Ban User</a>
-            <a class="action approve" href="">Remove Flags</a>
+    </tr>
+    {% endfor %}
+    <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
+        <td class="info" colspan="4">
+            {% trans "There are no posts awaiting moderation." %}
         </td>
     </tr>
     <tr class="footer">
