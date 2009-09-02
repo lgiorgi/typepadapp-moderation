@@ -34,10 +34,10 @@
     {% endfor %}
     <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
         <td class="info" colspan="4">
-            {% trans "There are no posts awaiting moderation." %}
+            {% trans "There are no flagged posts awaiting moderation." %}
         </td>
     </tr>
-    <tr class="footer">
+    <tr id="assets-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
         <td class="item-checkbox">
             <input type="checkbox" />
         </td>
