@@ -13,7 +13,7 @@
         <td class="item-checkbox">
             <input class="select cb" type="checkbox" value="" name="id"/>
         </td>
-        <td><a href="#" title="Who flagged this?">{{ asset.flag_count }} flags</a></td>
+        <td class="item-flags"><a href="#" title="Who flagged this?">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a></td>
         <td class="item-icon"><div class="type-icon {{ asset.asset_type }}-icon"></div></td>
         <td class="item-body">
             <div><a href="#">{{ asset.user_display_name }}</a> says:</div>
