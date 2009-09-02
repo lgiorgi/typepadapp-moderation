@@ -31,7 +31,7 @@ class PendingView(TypePadView):
     admin_required = True
 
     def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
-        assets = Asset.objects.filter(status=1)
+        assets = Asset.objects.filter(status=Asset.MODERATED)
         self.context.update(locals())
 
 
@@ -43,6 +43,10 @@ class FlaggedView(TypePadView):
     admin_required = True
 
     template_name = "moderation/flagged.html"
+
+    def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
+        assets = Asset.objects.filter(status=Asset.FLAGGED)
+        self.context.update(locals())
 
 
 def moderation_report(request):
