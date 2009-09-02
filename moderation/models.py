@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 
 
@@ -55,6 +56,13 @@ class Asset(models.Model):
                 SPAM:       'spam',
             }[self.status]
         except KeyError:
+            return None
+
+    def get_user_url(self):
+        """Relative url to the user's member profile page."""
+        try:
+            return reverse('member', args=[self.user_id])
+        except NoReverseMatch:
             return None
 
     # def approve(self):
