@@ -40,10 +40,10 @@ def moderate(request):
             asset.status = Asset.APPROVED
             asset.save()
         elif asset.status == Asset.MODERATED:
-            # TODO: we need to push this to TypePad
             content = AssetContent.objects.get(asset=asset)
 
             tp_asset = typepad.Asset.from_dict(json.loads(content.data))
+            # FIXME: https://intranet.sixapart.com/bugs/default.asp?88475
             # if content.attachment:
             #     tp_asset.file = content.attachment
 
@@ -54,15 +54,9 @@ def moderate(request):
             typepad.client.add_credentials(request.oauth_client.consumer,
                 token, domain=backend[1])
 
-            print "saving tp_asset"
             # TODO: check for fail
-            try:
-                tp_asset.save(group=request.group)
-            except Exception, ex:
-                print "got an exception: %s" % ex
-                raise ex
+            tp_asset.save(group=request.group)
 
-            print "deleting local asset"
             asset.delete()
         res = 'Post approved.'
     elif action == 'delete':
