@@ -263,7 +263,12 @@ def is_spam(request, post):
             'comment_author': request.user.display_name.encode('utf-8'),
         }
 
-        if ak.comment_check(post.content.encode('utf-8'), data=data, build_data=True):
+        content = post.content
+        # for link assets, lets include the link too
+        if isinstance(post, typepad.LinkAsset):
+            content += "\n" + post.links['target'].href
+
+        if ak.comment_check(content.encode('utf-8'), data=data, build_data=True):
             return True
 
     return False
