@@ -5,7 +5,8 @@
 <table cellspacing="0">
     <tr class="header">
         <td colspan="4">
-            Awaiting Moderation (<span id="asset-count">{{ assets.count }}</span>)
+            {% include "motion/bits/pagination.html" %}
+            Awaiting Moderation (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
     {% for asset in assets %}
@@ -41,6 +42,7 @@
             <input type="checkbox" class="check-all" />
         </td>
         <td colspan="3">
+            {% include "motion/bits/pagination.html" %}
             <a class="action approve" href="">Approve</a>
             <a class="action delete" href="">Delete</a>
             <a class="action ban" href="">Ban User</a>

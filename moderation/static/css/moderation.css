@@ -99,6 +99,12 @@ h1 {
 .item-body {
     width: auto;
 }
+.pagination {
+    float: right;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 4px;
+}
 /* action buttons */
 a.action {
     -moz-border-radius: 2px;
