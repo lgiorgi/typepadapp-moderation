@@ -66,10 +66,20 @@ h1 {
     width: 14px;
 }
 .type-icon {
-    background-image: url(/static/themes/motion/images/post-types.gif);
+    background-image: url(../../../../static/themes/motion/images/post-types.gif);
     height: 32px;
     width: 32px;
     margin-bottom: -16px; /* better way to do this? */
+    background-position: 0 -65px;
+}
+.post-icon {
+    background-position: 0 -65px;
+}
+.video-icon {
+    background-position: -132px -65px;
+}
+.audio-icon {
+    background-position: -99px -65px;
 }
 .link-icon {
     background-position: -66px -65px;
