@@ -184,6 +184,8 @@ def browser_upload(request):
     if not user.is_authenticated():
         return HttpResponseForbidden("invalid request")
 
+    request.user = user
+
     data = json.loads(request.POST['asset'])
     tp_asset = typepad.Asset.from_dict(data)
 
