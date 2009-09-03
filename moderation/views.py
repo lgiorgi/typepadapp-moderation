@@ -153,7 +153,7 @@ def moderation_report(request):
 
 def browser_upload(request):
     if not request.method == 'POST':
-        url = reverse('upload_url')
+        url = reverse('moderated_upload_url')
         url = 'for(;;);%s' % url # no third party sites allowed.
         return HttpResponse(url)
 
