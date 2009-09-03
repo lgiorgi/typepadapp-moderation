@@ -48,4 +48,7 @@ $(document).ready(function () {
         }
         return false;
     });
+    $('.check-all').click(function() {
+        $('[type="checkbox"]').attr('checked', $(this).attr('checked') ? 'checked': false);
+    });
 })
