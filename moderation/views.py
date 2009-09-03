@@ -12,6 +12,11 @@ from typepadapp.decorators import ajax_required
 import simplejson as json
 from datetime import datetime
 
+try:
+    import akismet
+except:
+    akismet = None
+
 
 class DashboardView(TypePadView):
     """
@@ -29,10 +34,25 @@ class PendingView(TypePadView):
     """
 
     template_name = "moderation/pending.html"
+
     admin_required = True
 
     def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
         assets = Asset.objects.filter(status=Asset.MODERATED)
+        self.context.update(locals())
+
+
+class SpamView(TypePadView):
+    """
+    Moderation queue of spam posts.
+    """
+
+    template_name = "moderation/spam.html"
+
+    admin_required = True
+
+    def select_from_typepad(self, request, view='moderation_spam', *args, **kwargs):
+        assets = Asset.objects.filter(status=Asset.SPAM)
         self.context.update(locals())
 
 
@@ -124,9 +144,6 @@ def moderation_report(request):
                 flag.note = note
             flag.save()
 
-
-
-
     if request.is_ajax():
         return HttpRepsonse('OK', mimetype='text/plain')
     else:
@@ -150,7 +167,7 @@ def browser_upload(request):
     data = json.loads(request.POST['asset'])
     tp_asset = typepad.Asset.from_dict(data)
 
-    moderate_post(tp_asset, request)
+    moderate_post(request, tp_asset)
 
     return HttpResponseRedirect(reverse('home'))
 
@@ -158,24 +175,25 @@ def browser_upload(request):
 def moderate_post(request, post):
     # save a copy of this content to our database
 
-    ip = request.META['REMOTE_ADDR']
+    post_status = moderation_status(request, post)
 
-    user = request.user
+    if post_status is None:
+        # handled; don't post to typepad
+        return True
 
-    # check for user/ip blocks
-    blacklisted = Blacklist.objects.filter(user_id=user.url_id)
-    ipblocked = IPBlock.objects.filter(ip_addr=ip)
+    if is_spam(request, post):
+        post_status = Asset.SPAM
 
-    if (blacklisted and blacklisted[0].block) \
-        or (ipblocked and ipblocked[0].block):
-        request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
+    # if moderation_status says the asset can be published, let it be so
+    if post_status == Asset.APPROVED:
+        return False
 
     asset = Asset()
     asset.asset_type = post.type_id
-    asset.user_id = user.url_id
-    asset.user_display_name = user.display_name
+    asset.user_id = request.user.url_id
+    asset.user_display_name = request.user.display_name
     asset.summary = unicode(post)
-    asset.status = Asset.MODERATED
+    asset.status = post_status
     asset.save()
 
     content = AssetContent()
@@ -184,7 +202,68 @@ def moderate_post(request, post):
     if request.FILES:
         content.attachment = request.FILES['file']
     content.user_token = request.oauth_client.token.to_string()
-    content.ip_addr = ip
+    content.ip_addr = request.META['REMOTE_ADDR']
     content.save()
 
     request.flash.add('notices', _('Thank you for your submission. It is awaiting moderation.'))
+
+    return True
+
+
+def moderation_status(request, post):
+    """Returns True if the request passes the filter, False if the request
+    cannot continue."""
+
+    if not hasattr(settings, 'USE_SELECTIVE_MODERATION') \
+        or not settings.USE_SELECTIVE_MODERATION:
+        # we moderate everything
+        return Asset.MODERATED
+
+    # check for user/ip blocks
+    blacklisted = Blacklist.objects.filter(user_id=request.user.url_id)
+    ipblocked = IPBlock.objects.filter(ip_addr=request.META['REMOTE_ADDR'])
+
+    if not (blacklisted or ipblocked):
+        return Asset.APPROVED
+
+    if (blacklisted and blacklisted[0].block) \
+        or (ipblocked and ipblocked[0].block):
+        request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
+        # we can't allow this user, so no post status
+        return None
+
+    return Asset.MODERATED
+
+
+def is_spam(request, post):
+    """Sends post content to TypePad AntiSpam for spam check.
+
+    Returns True if TPAS determines it is spam, False if not."""
+
+    # if we don't have akismet, we don't know; assume it isn't spam
+    if not akismet:
+        return False
+
+    # they didn't bother configuring an api key, so we can't test for spam
+    if not hasattr(settings, 'TYPEPAD_ANTISPAM_API_KEY'):
+        return False
+
+    ak = akismet.Akismet(
+        key=settings.TYPEPAD_ANTISPAM_API_KEY,
+        blog_url=settings.FRONTEND_URL
+    )
+    ak.baseurl = 'api.antispam.typepad.com/1.1/'
+
+    if ak.verify_key():
+        data = {
+            'user_ip': request.META.get('REMOTE_ADDR', '127.0.0.1'),
+            'user_agent': request.META.get('HTTP_USER_AGENT', ''),
+            'referrer': request.META.get('HTTP_REFERER', ''),
+            'comment_type': 'comment',
+            'comment_author': request.user.display_name.encode('utf-8'),
+        }
+
+        if ak.comment_check(post.content.encode('utf-8'), data=data, build_data=True):
+            return True
+
+    return False

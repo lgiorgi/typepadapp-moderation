@@ -33,10 +33,12 @@
                     {% url dashboard as dashboard_url %}
                     {% url pending as pending_url %}
                     {% url flagged as flagged_url %}
+                    {% url spam as spam_url %}
                     <ul>
-                        <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{% url dashboard %}">{% trans "Dashboard" %}</a></li>
-                        <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{% url pending %}">{% trans "Awaiting Moderation" %}</a></li>
-                        <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{% url flagged %}">{% trans "Flagged Posts" %}</a></li>
+                        <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{{ dashboard_url }}">{% trans "Dashboard" %}</a></li>
+                        <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{{ pending_url }}">{% trans "Awaiting Moderation" %}</a></li>
+                        <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{{ flagged_url }}">{% trans "Flagged Posts" %}</a></li>
+                        <li {% ifequal request.path spam_url %}class="selected"{% endifequal %}><a href="{{ spam_url }}">{% trans "Spam Posts" %}</a></li>
                     </ul>
                 </div>
                 <div class="content-main">

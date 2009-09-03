@@ -9,6 +9,7 @@ urlpatterns = patterns('moderation.views',
     url(r'^/?$', 'DashboardView', name='dashboard'),
     url(r'^/pending/?$', 'PendingView', name='pending'),
     url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
+    url(r'^/spam/?$', 'SpamView', name='spam'),
     url(r'^/report$', 'moderation_report', name='moderation_report'),
     url(r'^/upload$', 'browser_upload', name='moderated_upload_url'),
 )
