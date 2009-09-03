@@ -160,6 +160,8 @@ def moderate_post(request, post):
 
     ip = request.META['REMOTE_ADDR']
 
+    user = request.user
+
     # check for user/ip blocks
     blacklisted = Blacklist.objects.filter(user_id=user.url_id)
     ipblocked = IPBlock.objects.filter(ip_addr=ip)
