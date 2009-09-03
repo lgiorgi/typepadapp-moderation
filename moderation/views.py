@@ -147,47 +147,38 @@ def browser_upload(request):
     if not user.is_authenticated():
         return HttpResponseForbidden("invalid request")
 
-    ip = request.META['REMOTE_ADDR']
+    data = json.loads(request.POST['asset'])
+    tp_asset = typepad.Asset.from_dict(data)
 
+    moderate_post(tp_asset, request)
+
+    return HttpResponseRedirect(reverse('home'))
+
+
+def moderate_post(request, post):
+    # save a copy of this content to our database
+
+    ip = request.META['REMOTE_ADDR']
 
     # check for user/ip blocks
     blacklisted = Blacklist.objects.filter(user_id=user.url_id)
     ipblocked = IPBlock.objects.filter(ip_addr=ip)
 
-    if (blacklisted and blacklisted.block) \
-        or (ipblocked and ipblocked.block):
-        return HttpResponseForbidden("Sorry, you are not allowed to post.")
-
-
-    if request.FILES:
-        data = json.loads(request.POST['asset'])
-        tp_asset = typepad.Asset.from_dict(data)
-    else:
-        # some server-side validation
-        # non-file post
-        from motion import forms
-        form = forms.PostForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            tp_asset = form.save()
-        else:
-            request.flash.add('errors', _('Please correct the errors below.'))
-            return HttpResponseRedirect(request.path)
-
-
-    # save a copy of this content to our database
+    if (blacklisted and blacklisted[0].block) \
+        or (ipblocked and ipblocked[0].block):
+        request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
 
     asset = Asset()
-    asset.asset_type = tp_asset.type_id
+    asset.asset_type = post.type_id
     asset.user_id = user.url_id
     asset.user_display_name = user.display_name
-    asset.summary = unicode(tp_asset)
+    asset.summary = unicode(post)
     asset.status = Asset.MODERATED
     asset.save()
 
     content = AssetContent()
     content.asset = asset
-    content.data = json.dumps(tp_asset.to_dict())
+    content.data = json.dumps(post.to_dict())
     if request.FILES:
         content.attachment = request.FILES['file']
     content.user_token = request.oauth_client.token.to_string()
@@ -195,4 +186,3 @@ def browser_upload(request):
     content.save()
 
     request.flash.add('notices', _('Thank you for your submission. It is awaiting moderation.'))
-    return HttpResponseRedirect(reverse('home'))
