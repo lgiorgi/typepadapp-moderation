@@ -8,8 +8,11 @@ media_dir = os.path.join(app_path, 'static')
 urlpatterns = patterns('moderation.views',
     url(r'^/?$', 'DashboardView', name='dashboard'),
     url(r'^/pending/?$', 'PendingView', name='pending'),
+    url(r'^/pending/page/(?P<page>\d+)/?$', 'PendingView'),
     url(r'^/flagged/?$', 'FlaggedView', name='flagged'),
+    url(r'^/flagged/page/(?P<page>\d+)/?$', 'FlaggedView'),
     url(r'^/spam/?$', 'SpamView', name='spam'),
+    url(r'^/spam/page/(?P<page>\d+)/?$', 'SpamView'),
     url(r'^/report$', 'moderation_report', name='moderation_report'),
     url(r'^/upload$', 'browser_upload', name='moderated_upload_url'),
 )

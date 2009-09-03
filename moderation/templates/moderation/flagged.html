@@ -5,7 +5,8 @@
 <table cellspacing="0">
     <tr class="header">
         <td colspan="5">
-            Flagged Posts (<span id="asset-count">{{ assets.count }}</span>)
+            {% include "motion/bits/pagination.html" %}
+            Flagged Posts (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
     {% for asset in assets %}
@@ -42,6 +43,7 @@
             <input type="checkbox" class="check-all" />
         </td>
         <td colspan="4">
+            {% include "motion/bits/pagination.html" %}
             <a class="action delete" href="">Delete</a>
             <a class="action ban" href="">Ban User</a>
             <a class="action approve" href="">Remove Flags</a>

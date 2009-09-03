@@ -17,6 +17,8 @@ try:
 except:
     akismet = None
 
+ITEMS_PER_PAGE = 18 # TODO move this to settings!
+
 
 class DashboardView(TypePadView):
     """
@@ -33,13 +35,19 @@ class PendingView(TypePadView):
     Moderation queue of every new post, pending approval.
     """
 
-    template_name = "moderation/pending.html"
-
     admin_required = True
+    template_name = "moderation/pending.html"
+    paginate_by = ITEMS_PER_PAGE
 
     def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
-        assets = Asset.objects.filter(status=Asset.MODERATED)
+        self.paginate_template = reverse('pending') + '/page/%d'
+        self.object_list = Asset.objects.filter(status=Asset.MODERATED)
+
+    def get(self, request, *args, **kwargs):
+        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        assets = self.object_list[self.offset-1:self.offset-1+self.limit]
         self.context.update(locals())
+        return super(PendingView, self).get(request, *args, **kwargs)
 
 
 class SpamView(TypePadView):
@@ -47,13 +55,19 @@ class SpamView(TypePadView):
     Moderation queue of spam posts.
     """
 
-    template_name = "moderation/spam.html"
-
     admin_required = True
+    template_name = "moderation/spam.html"
+    paginate_by = ITEMS_PER_PAGE
 
     def select_from_typepad(self, request, view='moderation_spam', *args, **kwargs):
-        assets = Asset.objects.filter(status=Asset.SPAM)
+        self.paginate_template = reverse('spam') + '/page/%d'
+        self.object_list = Asset.objects.filter(status=Asset.SPAM)
+
+    def get(self, request, *args, **kwargs):
+        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        assets = self.object_list[self.offset-1:self.offset-1+self.limit]
         self.context.update(locals())
+        return super(SpamView, self).get(request, *args, **kwargs)
 
 
 class FlaggedView(TypePadView):
@@ -62,12 +76,18 @@ class FlaggedView(TypePadView):
     """
 
     admin_required = True
-
     template_name = "moderation/flagged.html"
+    paginate_by = ITEMS_PER_PAGE
 
-    def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
-        assets = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED])
+    def select_from_typepad(self, request, view='moderation_flagged', *args, **kwargs):
+        self.paginate_template = reverse('flagged') + '/page/%d'
+        self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED])
+
+    def get(self, request, *args, **kwargs):
+        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        assets = self.object_list[self.offset-1:self.offset-1+self.limit]
         self.context.update(locals())
+        return super(FlaggedView, self).get(request, *args, **kwargs)
 
 
 def moderation_report(request):
