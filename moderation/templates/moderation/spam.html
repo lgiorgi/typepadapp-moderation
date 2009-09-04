@@ -17,7 +17,7 @@
         <td class="item-icon"><div class="type-icon {{ asset.asset_type }}-icon"></div></td>
         <td class="item-body">
             <div><a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> says:</div>
-            {{ asset.summary }}
+            {{ asset.summary|linebreaks|truncatewords_html:settings.paragraph_wordcount }}
             <div><a href="">View full post</a></div>
         </td>
         <td class="item-actions">
