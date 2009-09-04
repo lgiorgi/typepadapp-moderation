@@ -249,6 +249,10 @@ def moderation_status(request, post=None):
     """Returns True if the request passes the filter, False if the request
     cannot continue."""
 
+    # don't moderate admins or featured users
+    if request.user.is_superuser or request.user.is_featured_member:
+        return Asset.APPROVED
+
     # default assumption for USE_MODERATION is to moderate all;
     # if MODERATE_SOME is True, use selective moderation
     if not hasattr(settings, 'MODERATE_SOME') \

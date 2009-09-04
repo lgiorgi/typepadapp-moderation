@@ -55,7 +55,13 @@ def moderate(request):
                 token, domain=backend[1])
 
             # TODO: check for fail
-            tp_asset.save(group=request.group)
+            if tp_asset.type_id == 'comment':
+                typepad.client.batch_request()
+                post = typepad.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
+                typepad.client.complete_batch()
+                post.comments.post(tp_asset)
+            else:
+                tp_asset.save(group=request.group)
 
             asset.delete()
         res = 'Post approved.'
