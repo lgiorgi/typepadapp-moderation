@@ -39,6 +39,7 @@ def moderate(request):
             asset.flag_count = 0
             asset.status = Asset.APPROVED
             asset.save()
+
         elif asset.status == Asset.MODERATED:
             content = AssetContent.objects.get(asset=asset)
 
@@ -65,8 +66,14 @@ def moderate(request):
 
             asset.delete()
         res = 'Post approved.'
+
     elif action == 'delete':
         # outright delete it?? or do we have a status for this?
+        if asset.asset_id:
+            # we need to remove from typepad
+            tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
+            tp_asset.delete()
+
         asset.delete()
         res = 'Post deleted.'
     else:
