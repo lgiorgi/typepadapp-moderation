@@ -172,19 +172,26 @@ def moderation_report(request):
 
 
 def browser_upload(request):
+    if not hasattr(request, 'user'):
+        typepad.client.batch_request()
+        user = get_user(request)
+        typepad.client.complete_batch()
+
+        request.user = user
+
     if not request.method == 'POST':
+        status = moderation_status(request)
+
+        if status == Asset.APPROVED:
+            import motion.ajax
+            return motion.ajax.upload_url(request)
+
         url = reverse('moderated_upload_url')
         url = 'for(;;);%s' % url # no third party sites allowed.
         return HttpResponse(url)
 
-    typepad.client.batch_request()
-    user = get_user(request)
-    typepad.client.complete_batch()
-
-    if not user.is_authenticated():
+    if not request.user.is_authenticated():
         return HttpResponseForbidden("invalid request")
-
-    request.user = user
 
     data = json.loads(request.POST['asset'])
     tp_asset = typepad.Asset.from_dict(data)
@@ -195,18 +202,24 @@ def browser_upload(request):
 
 
 def moderate_post(request, post):
+    """Determines the moderation behavior for the request and asset posted.
+
+    Returns True when the post has been handled (pre-moderated or blocked),
+    and returns False when the post is approved for posting."""
     # save a copy of this content to our database
 
     post_status = moderation_status(request, post)
 
     if post_status is None:
-        # handled; don't post to typepad
+        # blocked; don't post to typepad
         return True
 
     if is_spam(request, post):
+        # spammy posts get pre-moderated
         post_status = Asset.SPAM
 
     # if moderation_status says the asset can be published, let it be so
+    # what to do about uploads though?
     if post_status == Asset.APPROVED:
         return False
 
@@ -232,12 +245,14 @@ def moderate_post(request, post):
     return True
 
 
-def moderation_status(request, post):
+def moderation_status(request, post=None):
     """Returns True if the request passes the filter, False if the request
     cannot continue."""
 
-    if not hasattr(settings, 'USE_SELECTIVE_MODERATION') \
-        or not settings.USE_SELECTIVE_MODERATION:
+    # default assumption for USE_MODERATION is to moderate all;
+    # if MODERATE_SOME is True, use selective moderation
+    if not hasattr(settings, 'MODERATE_SOME') \
+        or not settings.MODERATE_SOME:
         # we moderate everything
         return Asset.MODERATED
 
@@ -250,9 +265,17 @@ def moderation_status(request, post):
 
     if (blacklisted and blacklisted[0].block) \
         or (ipblocked and ipblocked[0].block):
-        request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
+        if not request.is_ajax():
+            request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
         # we can't allow this user, so no post status
         return None
+
+    if post is not None:
+        # if this setting is available, only moderate for specified types;
+        # otherwise, moderate everything
+        if hasattr(settings, 'MODERATE_TYPES'):
+            if not post.type_id in settings.MODERATE_TYPES:
+                return Asset.APPROVED
 
     return Asset.MODERATED
 
