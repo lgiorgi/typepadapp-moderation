@@ -3,7 +3,19 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 
 
-assert(settings.UPLOAD_PATH)
+assert(settings.USE_MODERATION, 'USE_MODERATION setting must be assigned')
+assert(settings.UPLOAD_PATH, 'UPLOAD_PATH setting must be assigned')
+
+try:
+    settings.REPORT_OPTIONS
+except:
+    settings.REPORT_OPTIONS = [
+        ['Hateful'],
+        ['Sexual content'],
+        ['Copyright content'],
+        ['Spam'],
+        ['Admin: Suppress this post immediately', 1]
+    ]
 
 
 class Asset(models.Model):
@@ -23,6 +35,9 @@ class Asset(models.Model):
     user_display_name = models.CharField(max_length=255)
     """The name of the asset owner."""
 
+    user_userpic = models.CharField(max_length=255)
+    """The userpic URL of the asset owner."""
+
     asset_id = models.CharField(max_length=35, null=True)
     """TypePad ID (for flagged assets only)."""
 
@@ -33,7 +48,7 @@ class Asset(models.Model):
     summary = models.TextField(verbose_name="Summary")
     """Summary of the asset data."""
 
-    ts = models.DateTimeField(auto_now_add=True)
+    ts = models.DateTimeField(auto_now_add=True, db_index=True)
     """Timestamp for the creation of this asset record."""
 
     status = models.PositiveSmallIntegerField(verbose_name="Status", db_index=True, default=FLAGGED)
@@ -42,18 +57,25 @@ class Asset(models.Model):
     flag_count = models.PositiveIntegerField(db_index=True, default=0)
     """Records the total # of reports received for this asset."""
 
-    last_flagged = models.DateTimeField(null=True)
+    last_flagged = models.DateTimeField(null=True, db_index=True)
     """Holds the last timestamp we received a report for this asset."""
+
+    @property
+    def content(self):
+        try:
+            return AssetContent.objects.get(asset=self)
+        except:
+            return None
 
     @property
     def status_class(self):
         try:
             return {
-                MODERATED:  'moderated',
-                FLAGGED:    'flagged',
-                SUPPRESSED: 'suppressed', # flagged, but reached threshold
-                APPROVED:   'approved',
-                SPAM:       'spam',
+                self.MODERATED:  'moderated',
+                self.FLAGGED:    'flagged',
+                self.SUPPRESSED: 'suppressed', # flagged, but reached threshold
+                self.APPROVED:   'approved',
+                self.SPAM:       'spam',
             }[self.status]
         except KeyError:
             return None
@@ -138,6 +160,7 @@ class Blacklist(models.Model):
     moderated."""
 
     user_id = models.CharField(max_length=35, primary_key=True)
+    user_display_name = models.CharField(max_length=255)
     block = models.BooleanField(default=False)
     note = models.CharField(max_length=255, blank=True)
 
