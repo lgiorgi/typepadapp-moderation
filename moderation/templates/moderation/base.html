@@ -9,15 +9,31 @@
     <link rel="stylesheet" type="text/css" href="/moderation{{ settings.media_url }}css/moderation.css" />
 
     <script type="text/javascript" src="{{ settings.media_url }}typepadapp/js/jquery.js"></script>
+    <script type="text/javascript" src="{{ settings.media_url }}typepadapp/js/jquery-ui-1.6.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ settings.media_url }}typepadapp/css/smoothness/ui.all.css" />
+
     <script type="text/javascript" src="/moderation{{ settings.media_url }}js/moderation.js"></script>
     <script type="text/javascript">
         /* <![CDATA[ */
         settings.moderate_url = '{% url moderate %}';
+
+        $(document).ready(function() {
+            $("#view-dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 400,
+                buttons: {
+                    "Close": function() { $(this).dialog("close"); }
+                }
+            });
+        });
         /* ]]> */
     </script>
 </head>
 
-<body>
+<body class="{{ view }}">
     <div id="header">
         <div class="nav-links">
             <a href="{% url home %}">{% trans "Return to" %} {{ request.group.display_name }}</a>
@@ -33,12 +49,14 @@
                     {% url dashboard as dashboard_url %}
                     {% url pending as pending_url %}
                     {% url flagged as flagged_url %}
-                    {% url spam as spam_url %}
                     <ul>
                         <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{{ dashboard_url }}">{% trans "Dashboard" %}</a></li>
                         <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{{ pending_url }}">{% trans "Awaiting Moderation" %}</a></li>
                         <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{{ flagged_url }}">{% trans "Flagged Posts" %}</a></li>
+                        {% if settings.typepad_antispam_api_key %}
+                        {% url spam as spam_url %}
                         <li {% ifequal request.path spam_url %}class="selected"{% endifequal %}><a href="{{ spam_url }}">{% trans "Spam Posts" %}</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="content-main">
@@ -48,6 +66,15 @@
 
         </div><!-- end #container-inner -->
     </div><!-- end #container -->
+
+<div style="display:none">
+<div id="view-dialog" title="Full Post">
+    <div class="actions">
+        <ul class="hfeed" id="view-detail">
+        </ul>
+    </div>
+</div>
+</div>
 
 </body>
 </html>

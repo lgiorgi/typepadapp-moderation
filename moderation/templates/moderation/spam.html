@@ -1,5 +1,7 @@
 {% extends "moderation/base.html" %}
 {% load i18n %}
+{% load date_filters %}
+{% load typepad_filters %}
 
 {% block content-main %}
 <table cellspacing="0">
@@ -9,43 +11,57 @@
             Spam (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
+
     {% for asset in assets %}
-    <tr id="item-{{ asset.id }}" class="item">
+    <tr id="item-{{ asset.id }}" class="item {{ asset.status_class }}">
         <td class="item-checkbox">
-            <input class="select cb" type="checkbox" value="" name="id"/>
+            <input class="select cb" type="checkbox" value="{{ asset.id }}" name="id" />
         </td>
-        <td class="item-icon"><div class="type-icon {{ asset.asset_type }}-icon"></div></td>
+        <td class="item-userpic">
+            <a href="{{ asset.get_user_url }}"><img src="{{ asset.user_userpic }}" alt="{{ asset.user_display_name }}" height="50" width="50" /></a>
+        </td>
         <td class="item-body">
-            <div><a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> says:</div>
-            {{ asset.summary|linebreaks|truncatewords_html:settings.paragraph_wordcount }}
-            <div><a href="">View full post</a></div>
-        </td>
-        <td class="item-actions">
-            <a id="approve-{{ asset.id }}" class="action approve" href="#">Not Spam</a>
-            <a id="delete-{{ asset.id }}" class="action delete" href="#">Delete</a>
-            <a class="action ban" href="">Ban User</a>
+            <div class="item-actions">
+                <a id="approve-{{ asset.id }}" class="action approve" href="#">Not Spam</a>
+                <a id="delete-{{ asset.id }}" class="action delete" href="#">Delete</a>
+                <a id="ban-{{ asset.id }}" class="action ban" href="">Ban User</a>
+            </div>
+
+            <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> posted {{ asset.ts|pithy_timesince:"on" }}:</p>
+
+            {% with asset.summary|urlize|linebreaks|truncatewords_html:settings.paragraph_wordcount as summary %}
+
+            {{ summary }}
+
+            {% if summary|wordcount|greaterthan:settings.paragraph_wordcount %}
+            <p><a id="view-{{ asset.id }}" class="action view" href="">View full post</a></p>
+            {% endif %}
+            {% endwith %}
         </td>
     </tr>
+
     <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
         <td class="info" colspan="4">
             <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
     </tr>
     {% endfor %}
+
     <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
         <td class="info" colspan="4">
             {% trans "There are no spam posts. Hurrah!" %}
         </td>
     </tr>
+
     <tr id="assets-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
-            <a class="action approve" href="">Not Spam</a>
-            <a class="action delete" href="">Delete</a>
-            <a class="action ban" href="">Ban User</a>
+            <a class="action approve" id="approve-checked" href="">Not Spam</a>
+            <a class="action delete" id="delete-checked" href="">Delete</a>
+            <a class="action ban" id="ban-checked" href="">Ban User</a>
         </td>
     </tr>
 </table>
