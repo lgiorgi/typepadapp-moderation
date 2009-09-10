@@ -41,7 +41,7 @@ class PendingView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
         self.paginate_template = reverse('pending') + '/page/%d'
-        self.object_list = Asset.objects.filter(status=Asset.MODERATED)
+        self.object_list = Asset.objects.filter(status=Asset.MODERATED).order_by('ts')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this
@@ -61,7 +61,7 @@ class SpamView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_spam', *args, **kwargs):
         self.paginate_template = reverse('spam') + '/page/%d'
-        self.object_list = Asset.objects.filter(status=Asset.SPAM)
+        self.object_list = Asset.objects.filter(status=Asset.SPAM).order_by('ts')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this
@@ -81,7 +81,7 @@ class FlaggedView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_flagged', *args, **kwargs):
         self.paginate_template = reverse('flagged') + '/page/%d'
-        self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED])
+        self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this
@@ -117,6 +117,7 @@ def moderation_report(request):
         local_asset.asset_type = asset.type_id
         local_asset.user_id = asset.user.url_id
         local_asset.user_display_name = asset.user.display_name
+        local_asset.user_userpic = asset.user.userpic
         local_asset.flag_count = 1
         local_asset.status = Asset.FLAGGED
         local_asset.last_flagged = datetime.now()
@@ -227,6 +228,7 @@ def moderate_post(request, post):
     asset.asset_type = post.type_id
     asset.user_id = request.user.url_id
     asset.user_display_name = request.user.display_name
+    asset.user_userpic = request.user.userpic
     asset.summary = unicode(post)
     asset.status = post_status
     asset.save()
@@ -313,11 +315,16 @@ def is_spam(request, post):
         }
 
         content = post.content
+
         # for link assets, lets include the link too
         if isinstance(post, typepad.LinkAsset):
             content += "\n" + post.links['target'].href
 
-        if ak.comment_check(content.encode('utf-8'), data=data, build_data=True):
-            return True
+        # TPAS seems to rate empty posts as spam; since some asset types
+        # permit empty content (photo, audio, video posts for instance,
+        # we should allow these to pass)
+        if str(content) != '':
+            if ak.comment_check(content.encode('utf-8'), data=data, build_data=True):
+                return True
 
     return False
