@@ -1,3 +1,4 @@
+{% load generic_filters %}
 <div style="display:none">
 <div id="flag-dialog" title="Flag this post">
     <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}" style="width: 400px">
@@ -9,7 +10,15 @@
                 <select name="reason">
                     <option value="">Select one...</option>
                     {% for option in settings.report_options %}
+                    {% if not option.0|regex_search:"^-" %}
+                    {% if request.user.is_superuser %}
                     <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
+                    {% else %}
+                    {% if not option.0|regex_search:"^Admin" %}
+                    <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
                     {% endfor %}
                 </select>
             </ul>
