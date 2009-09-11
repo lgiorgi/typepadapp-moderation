@@ -1,5 +1,3 @@
-from urlparse import urlparse
-
 from django import http
 from django.conf import settings
 from django.contrib.auth import get_user
@@ -9,10 +7,8 @@ import simplejson as json
 
 import typepad
 from typepadapp.decorators import ajax_required
-from typepadapp.models import OAuthClient, User
+from typepadapp.models import User
 from moderation.models import Asset, Flag, AssetContent
-
-from oauth import oauth
 
 
 @ajax_required
@@ -40,74 +36,40 @@ def moderate(request):
             continue
 
         if action == 'approve':
-            if asset.status in (Asset.FLAGGED, Asset.SUPPRESSED):
-                # clear any flags too while we're at it
-                Flag.objects.filter(asset=asset).delete()
-                # leaving the asset as approved prevents it from being
-                # flagged again
-                asset.flag_count = 0
-                asset.status = Asset.APPROVED
-                asset.save()
-
-            elif asset.status == Asset.MODERATED:
-                content = asset.content
-                tp_asset = typepad.Asset.from_dict(json.loads(content.data))
-
-                # setup credentials of post author
-                backend = urlparse(settings.BACKEND_URL)
-                typepad.client.clear_credentials()
-                token = oauth.OAuthToken.from_string(content.user_token)
-                typepad.client.add_credentials(request.oauth_client.consumer,
-                    token, domain=backend[1])
-
-                # TODO: check for fail
-                if tp_asset.type_id == 'comment':
-                    typepad.client.batch_request()
-                    post = typepad.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
-                    typepad.client.complete_batch()
-                    post.comments.post(tp_asset)
-                else:
-                    if content.attachment.name:
-                        # file based asset; upload using signed browser upload
-                        oauth_client = OAuthClient(request.application)
-                        oauth_client.token = token
-                        remote_url = request.application.browser_upload_endpoint
-                        endpoint = oauth_client.get_file_upload_url(remote_url)
-                        tp_asset.save(endpoint, group=request.group, file=content.attachment)
-                    else:
-                        tp_asset.save(group=request.group)
-
-                asset.delete()
-
+            asset.approve()
             success.append(asset_id)
 
         elif action in ('delete', 'ban'):
             # outright delete it?? or do we have a status for this?
-            if asset.asset_id:
-                if action == 'ban':
-                    if asset.user_id not in ban_list:
-                        # also ban this user
-                        typepad.client.batch_request()
-                        user_memberships = User.get_by_url_id(asset.user_id).memberships.filter(by_group=request.group)
-                        typepad.client.complete_batch()
+            if action == 'ban':
+                if asset.user_id not in ban_list:
+                    # also ban this user
+                    typepad.client.batch_request()
+                    user_memberships = User.get_by_url_id(asset.user_id).memberships.filter(by_group=request.group)
+                    typepad.client.complete_batch()
+
+                    try:
+                        user_membership = user_memberships[0]
+
+                        if user_membership.is_admin():
+                            # cannot ban/unban another admin
+                            fail.append(asset_id)
+                            continue
 
                         try:
-                            user_membership = user_memberships[0]
-
-                            if user_membership.is_admin():
-                                # cannot ban/unban another admin
-                                fail.append(asset_id)
-                                continue
-
                             user_membership.block()
                             ban_list.append(asset.user_id)
+                        except Exception, ex:
+                            print "got an exception: %s" % str(ex)
+                            raise ex
 
-                        except IndexError:
-                            pass # no membership exists; ignore ban
+                    except IndexError:
+                        pass # no membership exists; ignore ban
 
-                # we need to remove from typepad
-                tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
-                tp_asset.delete()
+                if asset.asset_id:
+                    # we need to remove from typepad
+                    tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
+                    tp_asset.delete()
 
             asset.delete()
             success.append(asset_id)

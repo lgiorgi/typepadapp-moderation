@@ -1,10 +1,21 @@
+import simplejson as json
+from urlparse import urlparse
+
 from django.db import models
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 
+from oauth import oauth
 
-assert(settings.USE_MODERATION, 'USE_MODERATION setting must be assigned')
-assert(settings.UPLOAD_PATH, 'UPLOAD_PATH setting must be assigned')
+try:
+    settings.USE_MODERATION
+except:
+    raise Exception('USE_MODERATION setting must be assigned')
+
+try:
+    settings.UPLOAD_PATH
+except:
+    raise Exception('UPLOAD_PATH setting must be assigned')
 
 try:
     settings.REPORT_OPTIONS
@@ -16,6 +27,9 @@ except:
         ['Spam'],
         ['Admin: Suppress this post immediately', 1]
     ]
+
+import typepad
+from typepadapp import models as tp_models
 
 
 class Asset(models.Model):
@@ -87,11 +101,42 @@ class Asset(models.Model):
         except NoReverseMatch:
             return None
 
-    # def approve(self):
-    #     content = AssetContent.objects.get(asset=self)
-    #     if content:
-    #         asset = typepad.Asset.from_dict(content.data)
-    #         if content.attachment: # whoa, file upload!
+    def approve(self):
+        if self.status in (Asset.FLAGGED, Asset.SUPPRESSED):
+            # clear any flags too while we're at it
+            Flag.objects.filter(asset=self).delete()
+
+            # leaving the asset as approved prevents it from being
+            # flagged again
+            self.flag_count = 0
+            self.status = Asset.APPROVED
+            self.save()
+
+        elif self.status == Asset.MODERATED:
+            content = self.content
+            tp_asset = typepad.Asset.from_dict(json.loads(content.data))
+
+            # setup credentials of post author
+            backend = urlparse(settings.BACKEND_URL)
+            typepad.client.clear_credentials()
+            token = oauth.OAuthToken.from_string(content.user_token)
+            oauth_client = tp_models.OAuthClient(tp_models.APPLICATION)
+            typepad.client.add_credentials(oauth_client.consumer,
+                token, domain=backend[1])
+
+            # TODO: check for fail
+            if self.asset_type == 'comment':
+                typepad.client.batch_request()
+                post = typepad.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
+                typepad.client.complete_batch()
+                post.comments.post(tp_asset)
+            else:
+                if content.attachment.name:
+                    tp_asset.save(group=tp_models.GROUP, file=content.attachment)
+                else:
+                    tp_asset.save(group=tp_models.GROUP)
+
+            self.delete()
 
 
 class AssetContent(models.Model):
