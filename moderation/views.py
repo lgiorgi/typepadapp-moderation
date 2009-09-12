@@ -26,8 +26,14 @@ class DashboardView(TypePadView):
     """
 
     admin_required = True
-
     template_name = "moderation/dashboard.html"
+
+    def get(self, request, *args, **kwargs):
+        total_pending = Asset.objects.filter(status=Asset.MODERATED).count()
+        total_flagged = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).count()
+        total_spam = Asset.objects.filter(status=Asset.SPAM).count()
+        self.context.update(locals())
+        return super(DashboardView, self).get(request, *args, **kwargs)
 
 
 class PendingView(TypePadView):

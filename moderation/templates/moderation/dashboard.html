@@ -1,5 +1,25 @@
 {% extends "moderation/base.html" %}
 
 {% block content-main %}
-    <p>Welcome to Motion moderation! What should go here?</p>
+    <p>Welcome to Motion moderation!</p>
+
+    {% if total_flagged or total_pending or total_spam %}
+
+    {% if total_flagged %}
+    <p>There have been <a href="{% url flagged %}">{{ total_flagged }} posts that have been flagged for review.</p>
+    {% endif %}
+
+    {% if total_pending %}
+    <p>You have <a href="{% url pending %}">{{ total_pending }}</a> posts that are held for approval.
+    {% endif %}
+
+    {% if total_spam %}
+    <p>There are <a href="{% url spam %}">{{ total_spam }}</a> posts that were identified as spam.
+    {% endif %}
+
+    {% else %}
+
+    <p>Looks like there's nothing to do!</p>
+
+    {% endif %}
 {% endblock %}
