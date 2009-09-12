@@ -1,21 +1,43 @@
 {% extends "moderation/base.html" %}
+{% load typepad_filters %}
 
 {% block content-main %}
     <p>Welcome to Motion moderation!</p>
 
     {% if total_flagged or total_pending or total_spam %}
 
-    {% if total_flagged %}
-    <p>There have been <a href="{% url flagged %}">{{ total_flagged }} posts that have been flagged for review.</p>
+    {% if total_flagged %}{% spaceless %}
+    <p>
+    {% if total_flagged|greaterthan:1 %}
+    There are <a href="{% url flagged %}">{{ total_flagged }} posts</a>
+    that have been flagged for review.
+    {% else %}
+    There is <a href="{% url flagged %}">1 post</a> that has been flagged for review.
     {% endif %}
+    </p>
+    {% endspaceless %}{% endif %}
 
-    {% if total_pending %}
-    <p>You have <a href="{% url pending %}">{{ total_pending }}</a> posts that are held for approval.
+    {% if total_pending %}{% spaceless %}
+    <p>
+    {% if total_pending|greaterthan:1 %}
+    There are <a href="{% url pending %}">{{ total_pending }} posts</a>
+    that are held for approval.
+    {% else %}
+    There is <a href="{% url pending %}">1 post</a> held for approval.
     {% endif %}
+    </p>
+    {% endspaceless %}{% endif %}
 
-    {% if total_spam %}
-    <p>There are <a href="{% url spam %}">{{ total_spam }}</a> posts that were identified as spam.
+    {% if total_spam %}{% spaceless %}
+    <p>
+    {% if total_spam|greaterthan:1 %}
+    There are <a href="{% url spam %}">{{ total_spam }} posts</a> that were
+    identified as spam.
+    {% else %}
+    There is <a href="{% url spam %}">1 post</a> that was identified as spam.
     {% endif %}
+    </p>
+    {% endspaceless %}{% endif %}
 
     {% else %}
 
