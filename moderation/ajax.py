@@ -71,6 +71,21 @@ def moderate(request):
                     tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
                     tp_asset.delete()
 
+            content = asset.content
+            if content is not None:
+                if content.attachment is not None:
+                    # delete the attachment ourselves; this handles
+                    # the case where the file may not actually still be
+                    # on disk; we'll just ignore that since we're deleting
+                    # the row anyway
+                    try:
+                        content.attachment.delete()
+                    except IOError, ex:
+                        # something besides "file couldn't be opened"; reraise
+                        if ex.errno != 2:
+                            raise ex
+                    content.attachment = None
+                    content.save()
             asset.delete()
             success.append(asset_id)
 
