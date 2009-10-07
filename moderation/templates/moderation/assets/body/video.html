@@ -1,0 +1,15 @@
+{% extends base|default:"moderation/assets/body/base.html" %}
+{% load typepad_filters %}
+{% load i18n %}
+
+{% block media %}
+<div class="embed">
+    {% if asset.id %}
+    {# posted asset; so we have content to show #}
+    {% autoescape off %}{% with asset|enclosurebymaxwidth:settings.video_max_width as video %}{{ video.html }}{% endwith %}{% endautoescape %}
+    {% else %}
+    {# moderated asset; all we have is a link #}
+    <p>Video link: <a target="_blank" href="{{ asset.link }}">{{ asset.link }}</a></p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,6 +1,15 @@
 var settings = {
-    moderate_url: '',
+    moderate_url: ''
 };
+
+function toggleDetail(id) {
+    id = '#' + id;
+    if ($(id).hasClass("closed"))
+        $(id).removeClass("closed").addClass("open");
+    else
+        $(id).removeClass("open").addClass("closed");
+    return false;
+}
 
 // Moderate action
 function moderate(id, action) {

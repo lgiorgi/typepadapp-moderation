@@ -1,0 +1,7 @@
+{% load generic_filters %}
+
+{% ifequal asset.text_format "html" %}
+    {{ asset.content|sanitizetags }}
+{% else %}
+    {{ asset.content|urlize|linebreaks }}
+{% endifequal %}

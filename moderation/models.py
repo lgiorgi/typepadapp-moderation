@@ -74,12 +74,25 @@ class Asset(models.Model):
     last_flagged = models.DateTimeField(null=True, db_index=True)
     """Holds the last timestamp we received a report for this asset."""
 
+    def __init__(self, *args, **kwargs):
+        super(Asset, self).__init__(*args, **kwargs)
+        self._asset = None
+
     @property
     def content(self):
         try:
             return AssetContent.objects.get(asset=self)
         except:
             return None
+
+    @property
+    def asset(self):
+        """Returns a TypePad Asset object for this record."""
+        content = self.content
+        if content is None: return None
+        if self._asset is None:
+            self._asset = tp_models.Asset.from_dict(json.loads(content.data))
+        return self._asset
 
     @property
     def status_class(self):
@@ -114,7 +127,7 @@ class Asset(models.Model):
 
         elif self.status == Asset.MODERATED:
             content = self.content
-            tp_asset = typepad.Asset.from_dict(json.loads(content.data))
+            tp_asset = tp_models.Asset.from_dict(json.loads(content.data))
 
             # setup credentials of post author
             backend = urlparse(settings.BACKEND_URL)
@@ -127,7 +140,7 @@ class Asset(models.Model):
             # TODO: check for fail
             if self.asset_type == 'comment':
                 typepad.client.batch_request()
-                post = typepad.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
+                post = tp_models.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
                 typepad.client.complete_batch()
                 post.comments.post(tp_asset)
             else:

@@ -149,6 +149,18 @@ def moderation_report(request):
 
     local_asset.save()
 
+    # to avoid having to hit typepad for viewing this content,
+    # save a local copy to make moderation as fast as possible
+    # this data is removed once the post is processed.
+    if not local_asset.content:
+        content = AssetContent()
+        content.data = json.dumps(asset.to_dict())
+        content.asset = local_asset
+        content.user_token = 'none'
+        content.ip_addr = '0.0.0.0'
+        content.save()
+
+
     flag = Flag.objects.filter(user_id=user.url_id, asset=local_asset)
     if not flag:
         # lets not allow a single user to repeat a report on the same asset

@@ -57,6 +57,19 @@ h1 {
     margin-bottom: 1px;
     padding: 7px 19px 5px 5px;
 }
+.item .toggle-detail.open .open,
+.item .toggle-detail.closed .closed,
+.item .toggle-detail.open .detail,
+.item .toggle-detail.closed .summary {
+    display: block;
+}
+.item .toggle-detail.open .closed,
+.item .toggle-detail.closed .open,
+.item .toggle-detail.closed .detail,
+.item .toggle-detail.open .summary {
+    display: none;
+}
+
 .content-nav li.selected a, .content-nav li a:hover {
     text-decoration: none;
     background-color: #D5EBF8;

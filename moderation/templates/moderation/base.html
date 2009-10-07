@@ -31,6 +31,16 @@
         });
         /* ]]> */
     </script>
+
+    <!-- Audio Player for audio files -->
+    <link rel="stylesheet" type="text/css" href="{{ settings.media_url }}typepadapp/soundmanager/bacon-player.css" />
+    <script type="text/javascript" src="{{ settings.media_url }}typepadapp/soundmanager/soundmanager2-nodebug-jsmin.js"></script>
+    <script type="text/javascript" src="{{ settings.media_url }}typepadapp/soundmanager/bacon-player.js"></script>
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    soundManager.url = '{{ settings.media_url }}typepadapp/soundmanager/';
+    /* ]]> */
+    </script>
 </head>
 
 <body class="{{ view }}">

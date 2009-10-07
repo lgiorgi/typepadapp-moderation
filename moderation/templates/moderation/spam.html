@@ -26,17 +26,8 @@
                 <a id="delete-{{ asset.id }}" class="action delete" href="#">Delete</a>
                 <a id="ban-{{ asset.id }}" class="action ban" href="">Ban User</a>
             </div>
-
             <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> posted {{ asset.ts|pithy_timesince:"on" }}:</p>
-
-            {% with asset.summary|urlize|linebreaks|truncatewords_html:settings.paragraph_wordcount as summary %}
-
-            {{ summary }}
-
-            {% if summary|wordcount|greaterthan:settings.paragraph_wordcount %}
-            <p><a id="view-{{ asset.id }}" class="action view" href="">View full post</a></p>
-            {% endif %}
-            {% endwith %}
+            {% include "moderation/assets/asset.html" %}
         </td>
     </tr>
 

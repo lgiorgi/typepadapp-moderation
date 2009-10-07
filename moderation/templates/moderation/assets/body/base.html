@@ -1,0 +1,21 @@
+{# base template for asset content #}
+
+{% block title %}
+    {% if asset.title %}{% spaceless %}
+        {% if not asset.source %}
+            {% if settings.use_titles %}
+            <h2 class="entry-title"><a href="{{ asset.get_absolute_url }}">{{ asset.title }}</a></h2>
+            {% endif %}
+        {% else %}
+            <h2 class="entry-title"><a href="{{ asset.get_absolute_url }}">{% autoescape off %}{{ asset.title|striptags }}{% endautoescape %}</a></h2>
+        {% endif %}
+    {% endspaceless %}{% endif %}
+{% endblock %}
+
+{% block media %}{% endblock %}
+
+{% block content %}
+{% if asset.content %}
+    {% include "moderation/assets/bits/content.html" %}
+{% endif %}
+{% endblock %}

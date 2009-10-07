@@ -1,0 +1,20 @@
+{% load typepad_filters %}
+{% load withblock %}
+
+{% with asset.summary|urlize|linebreaks|truncatewords_html:settings.paragraph_wordcount as summary %}
+    <div id="detail-{{ asset.id }}" class="toggle-detail closed">
+    <div class="summary">{{ summary }}</div>
+    {% withblock %}{% spaceless %}
+    {% with asset.asset as asset %}
+    {% withblock %}moderation/assets/body/{{ asset.type_id }}.html{% as template_name %}
+    {% include template_name %}
+    {% endwithblock %}
+    {% endwith %}
+    {% endspaceless %}{% as detail %}
+    {% ifnotequal summary detail %}
+        <div class="detail">{{ detail }}</div>
+        <a href="javascript:void(0)" onclick="return toggleDetail('detail-{{ asset.id }}')"><span class="closed">more...</span><span class="open">less...</span></a>
+    {% endifnotequal %}
+    {% endwithblock %}
+    </div>
+{% endwith %}

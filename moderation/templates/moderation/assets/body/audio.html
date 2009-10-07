@@ -1,0 +1,13 @@
+{% extends base|default:"moderation/assets/body/base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block media %}
+{% with asset.title as title %}
+{% with asset.link as link %}
+{% with asset.url_id as id %}
+    {% include "baconplayer.html" %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endblock %}
