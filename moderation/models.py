@@ -92,6 +92,10 @@ class Asset(models.Model):
         if content is None: return None
         if self._asset is None:
             self._asset = tp_models.Asset.from_dict(json.loads(content.data))
+            if self._asset.id is None:
+                # this must be a pre-moderated thing; check for a file
+                if content.attachment is not None:
+                    self._asset.link_relation('enclosure').href = content.attachment.url
         return self._asset
 
     @property
