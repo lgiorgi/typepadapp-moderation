@@ -27,7 +27,7 @@
     </tr>
 
     {% for flag in flags %}
-    <tr>
+    <tr class="item">
         <td>
         <p><a href="{{ flag.get_user_url }}">{{ flag.user_display_name }}</a> flagged this post {{ flag.ts|pithy_timesince:"on" }}:</p>
         <p>{{ flag.reason }}</p>
