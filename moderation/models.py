@@ -190,6 +190,9 @@ class Flag(models.Model):
     user_id = models.CharField(max_length=35)
     """TypePad user id of the user reporting this asset."""
 
+    user_display_name = models.CharField(max_length=255)
+    """Name of the user reporting this asset."""
+
     reason_code = models.PositiveSmallIntegerField(default=0)
     """Category code of report."""
 
@@ -205,6 +208,13 @@ class Flag(models.Model):
     def reason(self):
         # TODO catch IndexError?
         return settings.REPORT_OPTIONS[self.reason_code][0]
+
+    def get_user_url(self):
+        """Relative url to the user's member profile page."""
+        try:
+            return reverse('member', args=[self.user_id])
+        except NoReverseMatch:
+            return None
 
     @classmethod
     def summary_for_asset(cls, asset):

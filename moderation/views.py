@@ -189,6 +189,7 @@ def moderation_report(request):
         flag.asset = local_asset
         flag.tp_asset_id = asset_id
         flag.user_id = user.url_id
+        flag.user_display_name = user.display_name
         if reason_code is not None:
             flag.reason_code = reason_code
         if note is not None:
