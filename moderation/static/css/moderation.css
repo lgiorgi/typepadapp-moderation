@@ -177,7 +177,9 @@ td.info {
     text-align: center;
     padding: 20px 0;
 }
-
+td.background {
+    background-color: #F0F5F8;
+}
 .item.suppressed {
     border-left: 2px solid red;
 }

@@ -96,6 +96,27 @@ class FlaggedView(TypePadView):
         return super(FlaggedView, self).get(request, *args, **kwargs)
 
 
+class FlaggedFlagsView(TypePadView):
+    """
+    Show who has flagged a particular post and why.
+    """
+
+    admin_required = True
+    template_name = "moderation/flags.html"
+    paginate_by = ITEMS_PER_PAGE
+
+    def select_from_typepad(self, request, view='moderation_flagged_flags', *args, **kwargs):
+        self.asset = Asset.objects.get(asset_id=kwargs['assetid'])
+        self.object_list = Flag.objects.filter(asset=self.asset)
+
+    def get(self, request, *args, **kwargs):
+        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        flags = self.object_list[self.offset-1:self.offset-1+self.limit]
+        asset = self.asset
+        self.context.update(locals())
+        return super(FlaggedFlagsView, self).get(request, *args, **kwargs)
+
+
 def moderation_report(request):
     asset_id = request.POST['asset-id']
     reason_code = int(request.POST.get('reason', 0))

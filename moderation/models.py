@@ -202,6 +202,10 @@ class Flag(models.Model):
     ip_addr = models.IPAddressField()
     """IP address of reporter."""
 
+    def reason(self):
+        # TODO catch IndexError?
+        return settings.REPORT_OPTIONS[self.reason_code][0]
+
     @classmethod
     def summary_for_asset(cls, asset):
         rs = cls.objects.filter(asset=asset)
