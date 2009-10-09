@@ -87,7 +87,10 @@ class FlaggedView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_flagged', *args, **kwargs):
         self.paginate_template = reverse('flagged') + '/page/%d'
-        self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
+        if request.GET.get('sort', None) == 'latest':
+            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('last_flagged', '-flag_count')
+        else:
+            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this

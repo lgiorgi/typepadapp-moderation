@@ -8,6 +8,7 @@
     <tr class="header">
         <td colspan="4">
             {% include "motion/bits/pagination.html" %}
+            {% if assets %}<div class="sort">Sort by: <a href="{{ request.path }}?sort=latest">last flagged</a> or <a href="{{ request.path }}?sort=most">most flags</a></div>{% endif %}
             Flagged Posts (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
