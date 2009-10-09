@@ -73,7 +73,7 @@ def moderate(request):
 
             content = asset.content
             if content is not None:
-                if content.attachment is not None:
+                if content.attachment is not None and content.attachment.name:
                     # delete the attachment ourselves; this handles
                     # the case where the file may not actually still be
                     # on disk; we'll just ignore that since we're deleting
