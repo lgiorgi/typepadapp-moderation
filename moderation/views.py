@@ -1,3 +1,32 @@
+# Copyright (c) 2009 Six Apart Ltd.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither the name of Six Apart Ltd. nor the names of its contributors may
+#   be used to endorse or promote products derived from this software without
+#   specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -291,8 +320,7 @@ def moderate_post(request, post):
 
 
 def moderation_status(request, post=None):
-    """Returns True if the request passes the filter, False if the request
-    cannot continue."""
+    """Returns a status for the post; None if the post is not permitted at all."""
 
     # don't moderate admins or featured users
     if request.user.is_superuser or request.user.is_featured_member:
@@ -366,8 +394,9 @@ def is_spam(request, post):
         # TPAS seems to rate empty posts as spam; since some asset types
         # permit empty content (photo, audio, video posts for instance,
         # we should allow these to pass)
-        if str(content) != '':
-            if ak.comment_check(content.encode('utf-8'), data=data, build_data=True):
+        encoded = content.encode('utf-8')
+        if encoded != '':
+            if ak.comment_check(encoded, data=data, build_data=True):
                 return True
 
     return False
