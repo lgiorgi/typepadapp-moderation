@@ -158,7 +158,7 @@ class Asset(models.Model):
             self.status = Asset.APPROVED
             self.save()
 
-        elif self.status == Asset.MODERATED:
+        elif self.status in (Asset.MODERATED, Asset.SPAM):
             content = self.content
             tp_asset = tp_models.Asset.from_dict(json.loads(content.data))
 
