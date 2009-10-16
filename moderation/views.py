@@ -156,8 +156,6 @@ def moderation_report(request):
 
     ip = request.META['REMOTE_ADDR']
 
-    # TBD: verify asset_id looks like an xid
-
     typepad.client.batch_request()
     user = get_user(request)
     asset = typepad.Asset.get_by_url_id(asset_id)
@@ -241,7 +239,10 @@ def moderation_report(request):
         return HttpRepsonse('OK', mimetype='text/plain')
     else:
         request.flash.add('notices', _('Thank you for your report.'))
-        return HttpResponseRedirect(asset.get_absolute_url())
+        if local_asset.status == Asset.SUPPRESSED:
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            return HttpResponseRedirect(asset.get_absolute_url())
 
 
 def browser_upload(request):
