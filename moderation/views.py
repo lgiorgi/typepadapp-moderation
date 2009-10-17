@@ -331,8 +331,13 @@ def moderation_status(request, post=None):
     # if MODERATE_SOME is True, use selective moderation
     if not hasattr(settings, 'MODERATE_SOME') \
         or not settings.MODERATE_SOME:
-        # we moderate everything
-        return Asset.MODERATED
+        if (post is not None) and hasattr(settings, 'MODERATE_TYPES'):
+            if post.type_id in settings.MODERATE_TYPES:
+                # we moderate certain types of things
+                return Asset.MODERATED
+        else:
+            # we moderate everything
+            return Asset.MODERATED
 
     # check for user/ip blocks
     blacklisted = Blacklist.objects.filter(user_id=request.user.url_id)
