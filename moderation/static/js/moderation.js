@@ -71,7 +71,7 @@ function moderate(id, action, redirect) {
                 // hide progress display for rows we've processed
                 for (var id in data['success']) {
                     $("#loader-" + data['success'][id]).hide();
-                    $("#item-" + data['success'][id]).val(false);
+                    $("#item-" + data['success'][id] + ' .cb[type="checkbox"]').attr('checked', false);
                 }
                 // redisplay assets that failed to approve/delete/etc.
                 for (var id in data['fail']) {
