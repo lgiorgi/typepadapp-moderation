@@ -2,7 +2,8 @@
 {% if not entry.moderation_approved %}
 <form id="flag-{{ entry.url_id }}" method="GET" action="">
     <button class="button-flag {% if entry.moderation_flagged %}flagged{% endif %}"
-        onclick="{% if not entry.moderation_flagged %}flagasset('{{ entry.url_id }}'); {% endif %}return false;">{% trans "Flag" %}
+        onclick="{% if not entry.moderation_flagged %}flagasset('{{ entry.url_id }}'); {% endif %}return false;"
+        title="{% trans "Flag this content for review" %}">{% trans "Flag" %}
     </button>
 </form>
 {% endif %}
