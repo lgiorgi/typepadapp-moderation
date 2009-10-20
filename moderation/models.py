@@ -296,18 +296,24 @@ class KeywordBlock(models.Model):
 
 
 def user_can_post(user, ip_addr):
+    """Returns a tuple identifying the posting state of the user in
+    the eyes of the moderation app.
+
+    The first value is a boolean as to whether the user is allowed
+    to create posts. The second identifies the moderation status."""
+
     blacklisted = Blacklist.objects.filter(user_id=user.url_id)
     if blacklisted:
         if blacklisted[0].block:
-            return False
+            return False, False
         else:
-            return True, "moderated"
+            return True, True
 
     ipblocked = IPBlock.objects.filter(ip_addr=ip_addr)
     if ipblocked:
         if ipblocked[0].block:
-            return False
+            return False, False
         else:
-            return True, "moderated"
+            return True, True
 
-    return True
+    return True, False
