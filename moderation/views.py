@@ -27,6 +27,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import re
+
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -161,6 +163,8 @@ def moderation_report(request):
     asset_id = request.POST['asset-id']
     reason_code = int(request.POST.get('reason', 0))
     note = request.POST.get('note', None)
+    return_to = request.POST.get('return_to', reverse('home'))
+    return_to = re.sub('.*?/', '/', return_to)
 
     ip = request.META['REMOTE_ADDR']
 
@@ -193,7 +197,7 @@ def moderation_report(request):
 
     if local_asset.status == Asset.APPROVED:
         request.flash.add('notices', _('This post has been approved by the site moderator.'))
-        return HttpResponseRedirect(asset.get_absolute_url())
+        return HttpResponseRedirect(return_to)
 
 
     # determine if this report is going to suppress the asset or not.
@@ -250,7 +254,7 @@ def moderation_report(request):
         if local_asset.status == Asset.SUPPRESSED:
             return HttpResponseRedirect(reverse('home'))
         else:
-            return HttpResponseRedirect(asset.get_absolute_url())
+            return HttpResponseRedirect(return_to)
 
 
 def browser_upload(request):

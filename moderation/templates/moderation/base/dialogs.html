@@ -3,6 +3,7 @@
 <div id="flag-dialog" title="Flag this post">
     <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}" style="width: 400px">
         <input type="hidden" id="flag-dialog-asset-id" name="asset-id" value="" />
+        <input type="hidden" name="return_to" value="{{ request.path }}" />
         <fieldset>
             <p>Please select a category that most closely reflects your
             concern about this post.</p>
