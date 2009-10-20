@@ -293,3 +293,15 @@ class KeywordBlock(models.Model):
     keyword = models.CharField(max_length=50, unique=True)
     block = models.BooleanField(default=False)
     note = models.CharField(max_length=255, blank=True)
+
+
+def user_can_post(user, ip_addr):
+    blacklisted = Blacklist.objects.filter(user_id=user.url_id)
+    if blacklisted and blacklisted[0].block:
+        return False
+
+    ipblocked = IPBlock.objects.filter(ip_addr=ip_addr)
+    if ipblocked and ipblocked[0].block:
+        return False
+
+    return True
