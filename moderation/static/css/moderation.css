@@ -9,7 +9,7 @@ body {
     background-color: #F0F5F8;
 }
 p {
-    margin: 0 0 10px;
+    margin: 10px 0;
 }
 a:link, a:visited, a:hover, a:active {
     color: #1E4469;
@@ -197,4 +197,11 @@ td.background {
     width: 560px;
     height: 300px;
     overflow: scroll;
+}
+
+#dashboard-summary {
+    font-size: 16px;
+}
+#dashboard-summary p a {
+    font-weight: bold;
 }
