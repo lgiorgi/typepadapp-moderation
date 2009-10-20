@@ -50,9 +50,9 @@
         </td>
         <td colspan="2">
             {% include "motion/bits/pagination.html" %}
-            <a class="action approve" id="approve-checked" href="">Not Spam</a>
-            <a class="action delete" id="delete-checked" href="">Delete</a>
-            <a class="action ban" id="ban-checked" href="">Ban User</a>
+            <a class="action approve" id="approve-checked" href="{% url spam %}">Not Spam</a>
+            <a class="action delete" id="delete-checked" href="{% url spam %}">Delete</a>
+            <a class="action ban" id="ban-checked" href="{% url spam %}">Ban User</a>
         </td>
     </tr>
 </table>
