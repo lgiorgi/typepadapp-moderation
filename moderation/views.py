@@ -59,7 +59,8 @@ class DashboardView(TypePadView):
 
     def get(self, request, *args, **kwargs):
         total_pending = Asset.objects.filter(status=Asset.MODERATED).count()
-        total_flagged = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).count()
+        total_flagged = Asset.objects.filter(status__in=[Asset.FLAGGED,
+            Asset.SUPPRESSED]).count()
         total_spam = Asset.objects.filter(status=Asset.SPAM).count()
         self.context.update(locals())
         return super(DashboardView, self).get(request, *args, **kwargs)
@@ -74,7 +75,8 @@ class PendingView(TypePadView):
     template_name = "moderation/pending.html"
     paginate_by = ITEMS_PER_PAGE
 
-    def select_from_typepad(self, request, view='moderation_pending', *args, **kwargs):
+    def select_from_typepad(self, request, view='moderation_pending',
+        *args, **kwargs):
         self.paginate_template = reverse('pending') + '/page/%d'
         self.object_list = Asset.objects.filter(status=Asset.MODERATED).order_by('ts')
 
@@ -114,15 +116,19 @@ class FlaggedView(TypePadView):
     template_name = "moderation/flagged.html"
     paginate_by = ITEMS_PER_PAGE
 
-    def select_from_typepad(self, request, view='moderation_flagged', *args, **kwargs):
+    def select_from_typepad(self, request, view='moderation_flagged',
+        *args, **kwargs):
         self.paginate_template = reverse('flagged') + '/page/%d'
         if request.GET.get('sort', None) == 'latest':
-            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('last_flagged', '-flag_count')
+            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED,
+                Asset.SUPPRESSED]).order_by('last_flagged', '-flag_count')
         else:
-            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED, Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
+            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED,
+                Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
 
     def get(self, request, *args, **kwargs):
-        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        # Limit the number of objects to display since the FinitePaginator
+        # doesn't do this
         assets = self.object_list[self.offset-1:self.offset-1+self.limit]
         self.context.update(locals())
         return super(FlaggedView, self).get(request, *args, **kwargs)
@@ -137,12 +143,14 @@ class FlaggedFlagsView(TypePadView):
     template_name = "moderation/flags.html"
     paginate_by = ITEMS_PER_PAGE
 
-    def select_from_typepad(self, request, view='moderation_flagged_flags', *args, **kwargs):
+    def select_from_typepad(self, request, view='moderation_flagged_flags',
+        *args, **kwargs):
         self.asset = Asset.objects.get(asset_id=kwargs['assetid'])
         self.object_list = Flag.objects.filter(asset=self.asset)
 
     def get(self, request, *args, **kwargs):
-        # Limit the number of objects to display since the FinitePaginator doesn't do this
+        # Limit the number of objects to display since the FinitePaginator
+        # doesn't do this
         flags = self.object_list[self.offset-1:self.offset-1+self.limit]
         asset = self.asset
         self.context.update(locals())
@@ -321,44 +329,44 @@ def moderate_post(request, post):
 
 
 def moderation_status(request, post=None):
-    """Returns a status for the post; None if the post is not permitted at all."""
+    """Returns a status for the post; None if the post is not permitted at all.
 
-    # don't moderate admins or featured users
+    This routine can be called without a post to attempt to determine the
+    moderation status of the user in context (whether they are blocked or not)."""
+
+    # don't moderate admins or featured users. ever.
     if request.user.is_superuser or request.user.is_featured_member:
         return Asset.APPROVED
 
+    user_moderation = False
+    if hasattr(settings, 'MODERATE_SOME') \
+        and settings.MODERATE_SOME:
+        user_moderation = True
+
+    type_moderation = False
+    if hasattr(settings, 'MODERATE_TYPES') \
+        and len(settings.MODERATE_TYPES) > 0:
+        type_moderation = True
+
     # default assumption for USE_MODERATION is to moderate all;
     # if MODERATE_SOME is True, use selective moderation
-    if not hasattr(settings, 'MODERATE_SOME') \
-        or not settings.MODERATE_SOME:
-        if (post is not None) and hasattr(settings, 'MODERATE_TYPES'):
-            if post.type_id in settings.MODERATE_TYPES:
-                # we moderate certain types of things
-                return Asset.MODERATED
-        else:
-            # we moderate everything
-            return Asset.MODERATED
+    if not (user_moderation or type_moderation):
+        # we pre-moderate unconditionally
+        return Asset.MODERATED
 
     # check for user/ip blocks
-    blacklisted = Blacklist.objects.filter(user_id=request.user.url_id)
-    ipblocked = IPBlock.objects.filter(ip_addr=request.META['REMOTE_ADDR'])
+    if user_moderation:
+        if not user_can_post(request.user, request.META['REMOTE_ADDR']):
+            if not request.is_ajax():
+                request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
+            # we can't allow this user, so no post status
+            return None
 
-    if not (blacklisted or ipblocked):
-        return Asset.APPROVED
-
-    if (blacklisted and blacklisted[0].block) \
-        or (ipblocked and ipblocked[0].block):
-        if not request.is_ajax():
-            request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
-        # we can't allow this user, so no post status
-        return None
-
-    if post is not None:
+    if type_moderation and (post is not None):
         # if this setting is available, only moderate for specified types;
         # otherwise, moderate everything
-        if hasattr(settings, 'MODERATE_TYPES'):
-            if not post.type_id in settings.MODERATE_TYPES:
-                return Asset.APPROVED
+        if not post.type_id in settings.MODERATE_TYPES:
+            return Asset.APPROVED
 
     return Asset.MODERATED
 
