@@ -45,7 +45,7 @@ class ModerationContext(object):
     def user_is_blocked(self):
         if self.request.user.is_authenticated() and self.request.user.is_superuser:
             return False
-        user_can_post = models.user_can_post(self.request.user,
+        user_can_post, moderated = models.user_can_post(self.request.user,
             self.request.META['REMOTE_ADDR'])
         return not user_can_post
 
