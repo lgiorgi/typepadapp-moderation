@@ -35,7 +35,7 @@ from django.conf import settings
 
 import typepad
 from typepadapp.views.base import TypePadView
-from moderation.models import Asset, Flag, AssetContent, Blacklist, IPBlock
+from moderation.models import Asset, Flag, AssetContent, Blacklist, IPBlock, user_can_post
 from typepadapp.decorators import ajax_required
 
 import simplejson as json
