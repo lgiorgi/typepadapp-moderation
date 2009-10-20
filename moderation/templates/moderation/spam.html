@@ -22,8 +22,8 @@
         </td>
         <td class="item-body">
             <div class="item-actions">
-                <a id="approve-{{ asset.id }}" class="action approve" href="#">Not Spam</a>
-                <a id="delete-{{ asset.id }}" class="action delete" href="#">Delete</a>
+                <a id="approve-{{ asset.id }}" class="action approve" href="">Not Spam</a>
+                <a id="delete-{{ asset.id }}" class="action delete" href="">Delete</a>
                 <a id="ban-{{ asset.id }}" class="action ban" href="">Ban User</a>
             </div>
             <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> posted {{ asset.ts|pithy_timesince:"on" }}:</p>
