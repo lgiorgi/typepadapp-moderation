@@ -362,7 +362,7 @@ def moderation_status(request, post=None):
                 request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
             # we can't allow this user, so no post status
             return None
-        if moderated is not None:
+        if moderated:
             # We can stop checking; this user has been specifically moderated
             return Asset.MODERATED
 
