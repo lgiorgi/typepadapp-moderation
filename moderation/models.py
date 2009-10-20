@@ -297,11 +297,17 @@ class KeywordBlock(models.Model):
 
 def user_can_post(user, ip_addr):
     blacklisted = Blacklist.objects.filter(user_id=user.url_id)
-    if blacklisted and blacklisted[0].block:
-        return False
+    if blacklisted:
+        if blacklisted[0].block:
+            return False
+        else:
+            return True, "moderated"
 
     ipblocked = IPBlock.objects.filter(ip_addr=ip_addr)
-    if ipblocked and ipblocked[0].block:
-        return False
+    if ipblocked:
+        if ipblocked[0].block:
+            return False
+        else:
+            return True, "moderated"
 
     return True

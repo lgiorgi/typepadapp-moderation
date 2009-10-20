@@ -356,16 +356,21 @@ def moderation_status(request, post=None):
 
     # check for user/ip blocks
     if user_moderation:
-        if not user_can_post(request.user, request.META['REMOTE_ADDR']):
+        can_post, moderated = user_can_post(request.user, request.META['REMOTE_ADDR'])
+        if not can_post:
             if not request.is_ajax():
                 request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
             # we can't allow this user, so no post status
             return None
+        if moderated is not None:
+            # We can stop checking; this user has been specifically moderated
+            return Asset.MODERATED
 
     if type_moderation and (post is not None):
         # if this setting is available, only moderate for specified types;
         # otherwise, moderate everything
         if not post.type_id in settings.MODERATE_TYPES:
+            # this post type does not require moderation
             return Asset.APPROVED
 
     return Asset.MODERATED
