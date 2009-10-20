@@ -6,7 +6,7 @@
 {% block content-main %}
 <table cellspacing="0">
     <tr class="header">
-        <td colspan="4">
+        <td colspan="3">
             {% include "motion/bits/pagination.html" %}
             Spam (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
@@ -32,14 +32,14 @@
     </tr>
 
     <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
     </tr>
     {% endfor %}
 
     <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             {% trans "There are no spam posts. Hurrah!" %}
         </td>
     </tr>
@@ -48,7 +48,7 @@
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>
-        <td colspan="3">
+        <td colspan="2">
             {% include "motion/bits/pagination.html" %}
             <a class="action approve" id="approve-checked" href="">Not Spam</a>
             <a class="action delete" id="delete-checked" href="">Delete</a>

@@ -6,7 +6,7 @@
 {% block content-main %}
 <table cellspacing="0">
     <tr class="header">
-        <td colspan="4">
+        <td colspan="3">
             {% include "motion/bits/pagination.html" %}
             {% if assets %}<div class="sort">Sort by: <a href="{{ request.path }}?sort=latest">last flagged</a> or <a href="{{ request.path }}?sort=most">most flags</a></div>{% endif %}
             Flagged Posts (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
@@ -17,15 +17,17 @@
     <tr id="item-{{ asset.id }}" class="item {{ asset.status_class }}">
         <td class="item-checkbox">
             <input class="select cb" type="checkbox" value="{{ asset.id }}" name="id" /><br />
-            <a href="{% url flags assetid=asset.asset_id %}" title="Who flagged this?">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
+            <a href="{% url flags assetid=asset.asset_id %}" title="Who flagged this and why?">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
         </td>
         <td class="item-userpic">
             <a href="{{ asset.get_user_url }}"><img src="{{ asset.user_userpic }}" alt="{{ asset.user_display_name }}" height="50" width="50" /></a>
         </td>
         <td class="item-body">
             <div class="item-actions">
+                {% if not asset.asset.source %}
                 <a id="delete-{{ asset.id }}" class="action delete" href="">Delete</a>
                 <a id="ban-{{ asset.id }}" class="action ban" href="">Ban User</a>
+                {% endif %}
                 <a id="approve-{{ asset.id }}" class="action approve" href="">Remove Flags</a>
             </div>
             <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}&rsquo;s</a> <a href="{% url asset postid=asset.asset_id %}" title="click to view full post" target="_blank">post</a> was last flagged {{ asset.last_flagged|pithy_timesince:"on" }}:</p>
@@ -34,14 +36,14 @@
     </tr>
 
     <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
     </tr>
     {% endfor %}
 
     <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             {% trans "There are no flagged posts awaiting moderation." %}
         </td>
     </tr>
@@ -50,7 +52,7 @@
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>
-        <td colspan="3">
+        <td colspan="2">
             {% include "motion/bits/pagination.html" %}
             <a class="action delete" id="delete-checked" href="">Delete</a>
             <a class="action ban" id="ban-checked" href="">Ban User</a>
