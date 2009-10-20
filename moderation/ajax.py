@@ -95,10 +95,17 @@ def moderate(request):
                     except IndexError:
                         pass # no membership exists; ignore ban
 
-                if asset.asset_id:
-                    # we need to remove from typepad
-                    tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
-                    tp_asset.delete()
+            if asset.asset_id:
+                # we need to remove from typepad
+                typepad.client.batch_request()
+                tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
+                typepad.client.complete_batch()
+
+                if tp_asset.source:
+                    fail.append(asset_id)
+                    continue
+
+                tp_asset.delete()
 
             content = asset.content
             if content is not None:
@@ -156,11 +163,11 @@ def moderate(request):
             return http.HttpResponseForbidden('{"message":"invalid request"}')
 
     if action == 'delete':
-        res = 'You deleted %d posts.' % len(success)
+        res = 'You deleted %d post(s).' % len(success)
     elif action == 'approve':
-        res = 'You approved %d posts.' % len(success)
+        res = 'You approved %d post(s).' % len(success)
     elif action == 'ban':
-        res = 'You banned %d users.' % len(ban_list)
+        res = 'You banned %d user(s).' % len(ban_list)
 
     data = json.dumps({
         "success": success,
