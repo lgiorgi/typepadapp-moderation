@@ -174,7 +174,10 @@ def moderation_report(request):
     try:
         typepad.client.complete_batch()
     except:
-        return HttpResponse('ERROR', mimetype='text/plain')
+        if request.is_ajax():
+            return HttpResponse(_("The requested post was not found."), mimetype='text/plain')
+        else:
+            return HttpResponse('ERROR', mimetype='text/plain')
 
     # TODO: Should we behave differently if the user is an admin?
 
@@ -196,8 +199,11 @@ def moderation_report(request):
 
 
     if local_asset.status == Asset.APPROVED:
-        request.flash.add('notices', _('This post has been approved by the site moderator.'))
-        return HttpResponseRedirect(return_to)
+        if request.is_ajax():
+            return HttpResponse(_("This post has been approved by the site moderator."), mimetype='text/plain')
+        else:
+            request.flash.add('notices', _('This post has been approved by the site moderator.'))
+            return HttpResponseRedirect(return_to)
 
 
     # determine if this report is going to suppress the asset or not.
@@ -248,7 +254,7 @@ def moderation_report(request):
             flag.save()
 
     if request.is_ajax():
-        return HttpRepsonse('OK', mimetype='text/plain')
+        return HttpResponse('OK', mimetype='text/plain')
     else:
         request.flash.add('notices', _('Thank you for your report.'))
         if local_asset.status == Asset.SUPPRESSED:

@@ -49,8 +49,30 @@
                 "Cancel": function() { $(this).dialog("close"); }
             }
         });
+        $('#flag-dialog-form').ajaxForm({
+            beforeSubmit: function() {
+                $("#flag-dialog").dialog('close');
+                var xid = $("#flag-dialog-asset-id").val();
+                var btn = $("#flag-" + xid + " button");
+                btn.hide().next().show();
+            },
+            success: function(responseText, statusText) {
+                if (responseText == "OK") {
+                    var xid = $("#flag-dialog-asset-id").val();
+                    $("#flag-" + xid + " button").addClass("flagged");
+                } else {
+                    alert(responseText);
+                }
+                var btn = $("#flag-" + xid + " button");
+                btn.show().next().hide();
+            }
+        });
     });
     function flagasset(xid) {
+        if ($("#flag-" + xid + " button").hasClass("flagged"))
+            return;
+        // reset form
+        $(':input','#flag-dialog-form').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
         $("#flag-dialog-asset-id").val(xid);
         $("#flag-dialog").dialog('open');
     }
