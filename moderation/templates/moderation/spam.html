@@ -4,7 +4,17 @@
 {% load typepad_filters %}
 
 {% block content-main %}
-<table cellspacing="0">
+
+{% if page_obj.paginator.count %}
+<p class="help">
+    Please review the posts below. &ldquo;Delete&rdquo; spam posts, which will
+    delete the content and the post will not show up on your TypePad Motion
+    site. If a post is not spam, select &ldquo;Publish&rdquo; to publish the
+    post.
+</p>
+{% endif %}
+
+<table class="data" cellspacing="0">
     <tr class="header">
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
@@ -56,4 +66,14 @@
         </td>
     </tr>
 </table>
+
+{% if page_obj.paginator.count %}
+<p class="help">
+    To approve or delete multiple posts at a time, select multiple posts using
+    the check boxes to the left of each post and the global action buttons at
+    the bottom of the page. You can also select all posts by selecting the
+    check box at the bottom of the page.
+</p>
+{% endif %}
+
 {% endblock %}

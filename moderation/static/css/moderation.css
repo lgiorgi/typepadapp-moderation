@@ -75,8 +75,8 @@ h1 {
     background-color: #D5EBF8;
     color: #222;
 }
-.content-main {
-    width: 100%;
+.content-main a {
+    text-decoration: underline;
 }
 .item-checkbox {
     width: 15px;
@@ -159,8 +159,8 @@ a.action {
     background-color: #EFE14A;
 }
 /* table */
-table {
-    width: 80%;
+table.data {
+    width: 100%;
     background-color: #FFF;
 }
 td {
@@ -201,6 +201,10 @@ td.background {
 
 #dashboard-summary {
     font-size: 16px;
+}
+.content-main .help {
+    font-size: 13px;
+    font-style: italic;
 }
 #dashboard-summary p a {
     font-weight: bold;
