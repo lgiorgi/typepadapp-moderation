@@ -27,7 +27,7 @@
     <tr id="item-{{ asset.id }}" class="item {{ asset.status_class }}">
         <td class="item-checkbox">
             <input class="select cb" type="checkbox" value="{{ asset.id }}" name="id" /><br />
-            <a href="{% url flags assetid=asset.asset_id %}" title="Who flagged this and why?">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
+            <a href="{% url flags assetid=asset.asset_id %}" title="Click here to review the reasons why this post was flagged">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
         </td>
         <td class="item-userpic">
             <a href="{{ asset.get_user_url }}"><img src="{{ asset.user_userpic }}" alt="{{ asset.user_display_name }}" height="50" width="50" /></a>
