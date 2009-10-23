@@ -61,16 +61,22 @@ import typepad
 from typepadapp import models as tp_models
 
 
-class Asset(models.Model):
+class Approved(models.Model):
+    "A holding table for all approved assets."
+
+    asset_id = models.CharField(max_length=35, primary_key=True)
+
+
+class Queue(models.Model):
     """Summary table for assets that are held or reported.
     """
 
     # states for these assets
+    APPROVED = 0
     MODERATED = 1
     FLAGGED = 2
     SUPPRESSED = 3
-    APPROVED = 4
-    SPAM = 5
+    SPAM = 4
 
     user_id = models.CharField(max_length=35)
     """TypePad user id of the asset owner."""
@@ -104,13 +110,13 @@ class Asset(models.Model):
     """Holds the last timestamp we received a report for this asset."""
 
     def __init__(self, *args, **kwargs):
-        super(Asset, self).__init__(*args, **kwargs)
+        super(Queue, self).__init__(*args, **kwargs)
         self._asset = None
 
     @property
     def content(self):
         try:
-            return AssetContent.objects.get(asset=self)
+            return QueueContent.objects.get(queue=self)
         except:
             return None
 
@@ -134,7 +140,6 @@ class Asset(models.Model):
                 self.MODERATED:  'moderated',
                 self.FLAGGED:    'flagged',
                 self.SUPPRESSED: 'suppressed', # flagged, but reached threshold
-                self.APPROVED:   'approved',
                 self.SPAM:       'spam',
             }[self.status]
         except KeyError:
@@ -148,17 +153,16 @@ class Asset(models.Model):
             return None
 
     def approve(self):
-        if self.status in (Asset.FLAGGED, Asset.SUPPRESSED):
+        if self.status in (Queue.FLAGGED, Queue.SUPPRESSED):
             # clear any flags too while we're at it
-            Flag.objects.filter(asset=self).delete()
+            Flag.objects.filter(queue=self).delete()
+            self.delete()
 
-            # leaving the asset as approved prevents it from being
-            # flagged again
-            self.flag_count = 0
-            self.status = Asset.APPROVED
-            self.save()
+            approved = Approved()
+            approved.asset_id = self.asset_id
+            approved.save()
 
-        elif self.status in (Asset.MODERATED, Asset.SPAM):
+        elif self.status in (Queue.MODERATED, Queue.SPAM):
             content = self.content
             tp_asset = tp_models.Asset.from_dict(json.loads(content.data))
 
@@ -185,12 +189,12 @@ class Asset(models.Model):
             self.delete()
 
 
-class AssetContent(models.Model):
+class QueueContent(models.Model):
     """Table to store original post data that will be posted to
     TypePad upon approval."""
 
-    asset = models.OneToOneField(Asset)
-    """Reference to parent Asset object."""
+    queue = models.OneToOneField(Queue)
+    """Reference to parent Queue object."""
 
     data = models.TextField(blank=False)
     """Holds JSON representation of asset."""
@@ -208,10 +212,10 @@ class AssetContent(models.Model):
 class Flag(models.Model):
     """Table to record each report we receive.
 
-    This table has a many-to-one relationship with the moderation Asset table."""
+    This table has a many-to-one relationship with the moderation Queue table."""
 
-    asset = models.ForeignKey(Asset, db_index=True)
-    """Reference to parent Asset object."""
+    queue = models.ForeignKey(Queue, db_index=True)
+    """Reference to parent Queue object."""
 
     tp_asset_id = models.CharField(max_length=35)
     """TypePad asset ID. 'asset_id' is the reference to the local asset."""
@@ -247,7 +251,7 @@ class Flag(models.Model):
 
     @classmethod
     def summary_for_asset(cls, asset):
-        rs = cls.objects.filter(asset=asset)
+        rs = cls.objects.filter(queue=asset)
         summary = {}
         for r in rs:
             if r.reason_code in summary:

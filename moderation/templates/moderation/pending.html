@@ -14,7 +14,7 @@
 </p>
 {% endif %}
 
-<table class="data" cellspacing="0">
+<table class="data" cellspacing="0" width="100%">
     <tr class="header">
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
@@ -60,9 +60,9 @@
         </td>
         <td colspan="2">
             {% include "motion/bits/pagination.html" %}
-            <a class="action approve" id="approve-checked" href="{% url pending %}">Approve</a>
-            <a class="action delete" id="delete-checked" href="{% url pending %}">Delete</a>
-            <a class="action ban" id="ban-checked" href="{% url pending %}">Ban User</a>
+            <a class="action approve" id="approve-checked" href="{% url moderation_pending %}">Approve</a>
+            <a class="action delete" id="delete-checked" href="{% url moderation_pending %}">Delete</a>
+            <a class="action ban" id="ban-checked" href="{% url moderation_pending %}">Ban User</a>
         </td>
     </tr>
 </table>

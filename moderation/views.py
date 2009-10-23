@@ -37,7 +37,7 @@ from django.conf import settings
 
 import typepad
 from typepadapp.views.base import TypePadView
-from moderation.models import Asset, Flag, AssetContent, Blacklist, IPBlock, user_can_post
+from moderation.models import Queue, Approved, Flag, QueueContent, Blacklist, IPBlock, user_can_post
 from typepadapp.decorators import ajax_required
 
 import simplejson as json
@@ -60,10 +60,10 @@ class DashboardView(TypePadView):
     template_name = "moderation/dashboard.html"
 
     def get(self, request, *args, **kwargs):
-        total_pending = Asset.objects.filter(status=Asset.MODERATED).count()
-        total_flagged = Asset.objects.filter(status__in=[Asset.FLAGGED,
-            Asset.SUPPRESSED]).count()
-        total_spam = Asset.objects.filter(status=Asset.SPAM).count()
+        total_pending = Queue.objects.filter(status=Queue.MODERATED).count()
+        total_flagged = Queue.objects.filter(status__in=[Queue.FLAGGED,
+            Queue.SUPPRESSED]).count()
+        total_spam = Queue.objects.filter(status=Queue.SPAM).count()
         self.context.update(locals())
         return super(DashboardView, self).get(request, *args, **kwargs)
 
@@ -79,8 +79,8 @@ class PendingView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_pending',
         *args, **kwargs):
-        self.paginate_template = reverse('pending') + '/page/%d'
-        self.object_list = Asset.objects.filter(status=Asset.MODERATED).order_by('ts')
+        self.paginate_template = reverse('moderation_pending') + '/page/%d'
+        self.object_list = Queue.objects.filter(status=Queue.MODERATED).order_by('ts')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this
@@ -99,8 +99,8 @@ class SpamView(TypePadView):
     paginate_by = ITEMS_PER_PAGE
 
     def select_from_typepad(self, request, view='moderation_spam', *args, **kwargs):
-        self.paginate_template = reverse('spam') + '/page/%d'
-        self.object_list = Asset.objects.filter(status=Asset.SPAM).order_by('ts')
+        self.paginate_template = reverse('moderation_spam') + '/page/%d'
+        self.object_list = Queue.objects.filter(status=Queue.SPAM).order_by('ts')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator doesn't do this
@@ -120,13 +120,14 @@ class FlaggedView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_flagged',
         *args, **kwargs):
-        self.paginate_template = reverse('flagged') + '/page/%d'
+        self.paginate_template = reverse('moderation_flagged') + '/page/%d'
         if request.GET.get('sort', None) == 'latest':
-            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED,
-                Asset.SUPPRESSED]).order_by('last_flagged', '-flag_count')
+            self.paginate_template += '?sort=latest'
+            self.object_list = Queue.objects.filter(status__in=[Queue.FLAGGED,
+                Queue.SUPPRESSED]).order_by('last_flagged', '-flag_count')
         else:
-            self.object_list = Asset.objects.filter(status__in=[Asset.FLAGGED,
-                Asset.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
+            self.object_list = Queue.objects.filter(status__in=[Queue.FLAGGED,
+                Queue.SUPPRESSED]).order_by('-flag_count', 'last_flagged')
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator
@@ -147,14 +148,14 @@ class FlaggedFlagsView(TypePadView):
 
     def select_from_typepad(self, request, view='moderation_flagged_flags',
         *args, **kwargs):
-        self.asset = Asset.objects.get(asset_id=kwargs['assetid'])
-        self.object_list = Flag.objects.filter(asset=self.asset)
+        self.queue = Queue.objects.get(asset_id=kwargs['assetid'])
+        self.object_list = Flag.objects.filter(queue=self.queue)
 
     def get(self, request, *args, **kwargs):
         # Limit the number of objects to display since the FinitePaginator
         # doesn't do this
         flags = self.object_list[self.offset-1:self.offset-1+self.limit]
-        asset = self.asset
+        asset = self.queue
         self.context.update(locals())
         return super(FlaggedFlagsView, self).get(request, *args, **kwargs)
 
@@ -181,24 +182,25 @@ def moderation_report(request):
 
     # TODO: Should we behave differently if the user is an admin?
 
-    local_asset = Asset.objects.filter(asset_id=asset_id)
-    if not local_asset:
-        local_asset = Asset()
-        local_asset.asset_id = asset_id
-        local_asset.summary = unicode(asset)
-        local_asset.asset_type = asset.type_id
-        local_asset.user_id = asset.user.url_id
-        local_asset.user_display_name = asset.user.display_name
-        local_asset.user_userpic = asset.user.userpic
-        local_asset.flag_count = 1
-        local_asset.status = Asset.FLAGGED
-        local_asset.last_flagged = datetime.now()
+    queue = Queue.objects.filter(asset_id=asset_id)
+    if not queue:
+        queue = Queue()
+        queue.asset_id = asset_id
+        queue.summary = unicode(asset)
+        queue.asset_type = asset.type_id
+        queue.user_id = asset.user.url_id
+        queue.user_display_name = asset.user.display_name
+        queue.user_userpic = asset.user.userpic
+        queue.flag_count = 1
+        queue.status = Queue.FLAGGED
+        queue.last_flagged = datetime.now()
     else:
-        local_asset = local_asset[0]
-        local_asset.flag_count += 1
+        queue = queue[0]
+        queue.flag_count += 1
 
+    approved = Approved.objects.filter(asset_id=asset_id)
 
-    if local_asset.status == Asset.APPROVED:
+    if len(approved):
         if request.is_ajax():
             return HttpResponse(_("This post has been approved by the site moderator."), mimetype='text/plain')
         else:
@@ -207,34 +209,34 @@ def moderation_report(request):
 
 
     # determine if this report is going to suppress the asset or not.
-    if local_asset.status != Asset.SUPPRESSED:
+    if queue.status != Queue.SUPPRESSED:
         # count # of flags for this reason and asset:
         if len(settings.REPORT_OPTIONS[reason_code]) > 1:
             trigger = settings.REPORT_OPTIONS[reason_code][1]
             count = Flag.objects.filter(tp_asset_id=asset_id, reason_code=reason_code).count()
             if count + 1 >= trigger:
-                local_asset.status = Asset.SUPPRESSED
+                queue.status = Queue.SUPPRESSED
 
 
-    local_asset.save()
+    queue.save()
 
     # to avoid having to hit typepad for viewing this content,
     # save a local copy to make moderation as fast as possible
     # this data is removed once the post is processed.
-    if not local_asset.content:
-        content = AssetContent()
+    if not queue.content:
+        content = QueueContent()
         content.data = json.dumps(asset.to_dict())
-        content.asset = local_asset
+        content.queue = queue
         content.user_token = 'none'
         content.ip_addr = '0.0.0.0'
         content.save()
 
 
-    flag = Flag.objects.filter(user_id=user.url_id, asset=local_asset)
+    flag = Flag.objects.filter(user_id=user.url_id, queue=queue)
     if not flag:
         # lets not allow a single user to repeat a report on the same asset
         flag = Flag()
-        flag.asset = local_asset
+        flag.queue = queue
         flag.tp_asset_id = asset_id
         flag.user_id = user.url_id
         flag.user_display_name = user.display_name
@@ -257,7 +259,7 @@ def moderation_report(request):
         return HttpResponse('OK', mimetype='text/plain')
     else:
         request.flash.add('notices', _('Thank you for your report.'))
-        if local_asset.status == Asset.SUPPRESSED:
+        if queue.status == Queue.SUPPRESSED:
             return HttpResponseRedirect(reverse('home'))
         else:
             return HttpResponseRedirect(return_to)
@@ -274,7 +276,7 @@ def browser_upload(request):
     if not request.method == 'POST':
         status = moderation_status(request)
 
-        if status == Asset.APPROVED:
+        if status == Queue.APPROVED:
             import motion.ajax
             return motion.ajax.upload_url(request)
 
@@ -300,6 +302,10 @@ def moderate_post(request, post):
     and returns False when the post is approved for posting."""
     # save a copy of this content to our database
 
+    # do this check first of all to avoid any possible spam filtering
+    if request.user.is_superuser or request.user.is_featured_member:
+        return False
+
     post_status = moderation_status(request, post)
 
     if post_status is None:
@@ -308,24 +314,24 @@ def moderate_post(request, post):
 
     if is_spam(request, post):
         # spammy posts get pre-moderated
-        post_status = Asset.SPAM
+        post_status = Queue.SPAM
 
     # if moderation_status says the asset can be published, let it be so
     # what to do about uploads though?
-    if post_status == Asset.APPROVED:
+    if post_status == Queue.APPROVED:
         return False
 
-    asset = Asset()
-    asset.asset_type = post.type_id
-    asset.user_id = request.user.url_id
-    asset.user_display_name = request.user.display_name
-    asset.user_userpic = request.user.userpic
-    asset.summary = unicode(post)
-    asset.status = post_status
-    asset.save()
+    queue = Queue()
+    queue.asset_type = post.type_id
+    queue.user_id = request.user.url_id
+    queue.user_display_name = request.user.display_name
+    queue.user_userpic = request.user.userpic
+    queue.summary = unicode(post)
+    queue.status = post_status
+    queue.save()
 
-    content = AssetContent()
-    content.asset = asset
+    content = QueueContent()
+    content.queue = queue
     content.data = json.dumps(post.to_dict())
     if request.FILES:
         content.attachment = request.FILES['file']
@@ -346,7 +352,7 @@ def moderation_status(request, post=None):
 
     # don't moderate admins or featured users. ever.
     if request.user.is_superuser or request.user.is_featured_member:
-        return Asset.APPROVED
+        return Queue.APPROVED
 
     user_moderation = False
     if hasattr(settings, 'MODERATE_SOME') \
@@ -362,7 +368,7 @@ def moderation_status(request, post=None):
     # if MODERATE_SOME is True, use selective moderation
     if not (user_moderation or type_moderation):
         # we pre-moderate unconditionally
-        return Asset.MODERATED
+        return Queue.MODERATED
 
     # check for user/ip blocks
     if user_moderation:
@@ -374,16 +380,16 @@ def moderation_status(request, post=None):
             return None
         if moderated:
             # We can stop checking; this user has been specifically moderated
-            return Asset.MODERATED
+            return Queue.MODERATED
 
     if type_moderation and (post is not None):
         # if this setting is available, only moderate for specified types;
         # otherwise, moderate everything
         if not post.type_id in settings.MODERATE_TYPES:
             # this post type does not require moderation
-            return Asset.APPROVED
+            return Queue.APPROVED
 
-    return Asset.MODERATED
+    return Queue.MODERATED
 
 
 def is_spam(request, post):

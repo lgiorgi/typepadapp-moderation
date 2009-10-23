@@ -39,7 +39,7 @@ class ModerationContext(object):
 
     def count(self):
         if self.request.user.is_authenticated() and self.request.user.is_superuser:
-            return models.Asset.objects.count()
+            return models.Queue.objects.count()
         return 0
 
     def user_is_blocked(self):

@@ -5,13 +5,13 @@
 {% load withblock %}
 
 {% block content-main %}
-<table cellspacing="0">
+<table class="data" cellspacing="0" width="100%">
     <tr>
         <td class="item-body">
             <div class="item-actions">
-                <a id="delete-{{ asset.id }}" class="action delete" href="{% url flagged %}">Delete</a>
-                <a id="ban-{{ asset.id }}" class="action ban" href="{% url flagged %}">Ban User</a>
-                <a id="approve-{{ asset.id }}" class="action approve" href="{% url flagged %}">Remove Flags</a>
+                <a id="delete-{{ asset.id }}" class="action delete" href="{% url moderation_flagged %}">Delete</a>
+                <a id="ban-{{ asset.id }}" class="action ban" href="{% url moderation_flagged %}">Ban User</a>
+                <a id="approve-{{ asset.id }}" class="action approve" href="{% url moderation_flagged %}">Remove Flags</a>
             </div>
             <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}&rsquo;s</a> <a href="{% url asset postid=asset.asset_id %}" title="click to view full post" target="_blank">post</a>:</p>
             {% spaceless %}

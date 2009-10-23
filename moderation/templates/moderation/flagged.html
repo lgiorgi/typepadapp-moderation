@@ -14,7 +14,7 @@
 </p>
 {% endif %}
 
-<table class="data" cellspacing="0">
+<table class="data" cellspacing="0" width="100%">
     <tr class="header">
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
@@ -27,7 +27,7 @@
     <tr id="item-{{ asset.id }}" class="item {{ asset.status_class }}">
         <td class="item-checkbox">
             <input class="select cb" type="checkbox" value="{{ asset.id }}" name="id" /><br />
-            <a href="{% url flags assetid=asset.asset_id %}" title="Click here to review the reasons why this post was flagged">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
+            <a href="{% url moderation_flags assetid=asset.asset_id %}" title="Click here to review the reasons why this post was flagged">{{ asset.flag_count }} flag{{ asset.flag_count|pluralize }}</a>
         </td>
         <td class="item-userpic">
             <a href="{{ asset.get_user_url }}"><img src="{{ asset.user_userpic }}" alt="{{ asset.user_display_name }}" height="50" width="50" /></a>
@@ -64,9 +64,9 @@
         </td>
         <td colspan="2">
             {% include "motion/bits/pagination.html" %}
-            <a class="action delete" id="delete-checked" href="{% url flagged %}">Delete</a>
-            <a class="action ban" id="ban-checked" href="{% url flagged %}">Ban User</a>
-            <a class="action approve" id="approve-checked" href="{% url flagged %}">Remove Flags</a>
+            <a class="action delete" id="delete-checked" href="{% url moderation_flagged %}">Delete</a>
+            <a class="action ban" id="ban-checked" href="{% url moderation_flagged %}">Ban User</a>
+            <a class="action approve" id="approve-checked" href="{% url moderation_flagged %}">Remove Flags</a>
         </td>
     </tr>
 </table>

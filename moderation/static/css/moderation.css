@@ -40,12 +40,13 @@ h1 {
 #container {
     padding: 20px 40px;
 }
-.col {
-    display: inline;
-    float: left;
-}
 .content-nav {
+    float: left;
+    width: 180px;
     margin-right: 20px;
+}
+.content-main {
+    margin-left: 200px;
 }
 .content-nav li a {
     -moz-border-radius: 2px;
@@ -158,9 +159,12 @@ a.action {
 .ban {
     background-color: #EFE14A;
 }
+#content {
+    float: left;
+    width: 100%;
+}
 /* table */
 table.data {
-    width: 100%;
     background-color: #FFF;
 }
 td {

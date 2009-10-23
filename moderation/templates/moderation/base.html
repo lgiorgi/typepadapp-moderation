@@ -49,32 +49,28 @@
             <a href="{% url home %}">{% trans "Return to" %} {{ request.group.display_name }}</a>
             <a href="{% url logout %}">{% trans "Sign out" %}</a>
         </div>
-        <h1><a href="{% url dashboard %}">{% trans "Moderation for" %} {{ request.group.display_name }}</a></h1>
+        <h1><a href="{% url moderation_home %}">{% trans "Moderation for" %} {{ request.group.display_name }}</a></h1>
     </div>
     <div id="container">
         <div id="container-inner">
             <div id="flash-notice" class="flash notice" onclick="$(this).fadeOut();" style="display: none;"></div>
             <div id="content">
                 <div class="content-nav col">
-                    {% url dashboard as dashboard_url %}
-                    {% url pending as pending_url %}
-                    {% url flagged as flagged_url %}
+                    {% url moderation_home as dashboard_url %}
+                    {% url moderation_pending as pending_url %}
+                    {% url moderation_flagged as flagged_url %}
                     <ul>
                         <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{{ dashboard_url }}">{% trans "Dashboard" %}</a></li>
                         <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{{ pending_url }}">{% trans "Awaiting Moderation" %}</a></li>
                         <li {% ifequal request.path flagged_url %}class="selected"{% endifequal %}><a href="{{ flagged_url }}">{% trans "Flagged Posts" %}</a></li>
                         {% if settings.typepad_antispam_api_key %}
-                        {% url spam as spam_url %}
+                        {% url moderation_spam as spam_url %}
                         <li {% ifequal request.path spam_url %}class="selected"{% endifequal %}><a href="{{ spam_url }}">{% trans "Spam Posts" %}</a></li>
                         {% endif %}
                     </ul>
                 </div>
                 <div class="content-main">
-                    <table cellspacing="0">
-                        <tr><td>
                 {% block content-main %}{% endblock %}
-                        </td></tr>
-                    </table>
                 </div>
             </div><!-- end #content -->
 

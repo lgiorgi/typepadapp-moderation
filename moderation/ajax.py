@@ -37,7 +37,7 @@ import simplejson as json
 import typepad
 from typepadapp.decorators import ajax_required
 from typepadapp.models import User
-from moderation.models import Asset, Flag, AssetContent
+from moderation.models import Queue, Flag, QueueContent
 
 
 @ajax_required
@@ -59,13 +59,13 @@ def moderate(request):
     ban_list = []
     for asset_id in asset_ids:
         try:
-            asset = Asset.objects.get(id=asset_id)
+            queue = Queue.objects.get(id=asset_id)
         except:
             fail.append(asset_id)
             continue
 
         if action == 'approve':
-            asset.approve()
+            queue.approve()
             success.append(asset_id)
 
         elif action in ('delete', 'ban'):
@@ -74,7 +74,7 @@ def moderate(request):
                 if asset.user_id not in ban_list:
                     # also ban this user
                     typepad.client.batch_request()
-                    user_memberships = User.get_by_url_id(asset.user_id).memberships.filter(by_group=request.group)
+                    user_memberships = User.get_by_url_id(queue.user_id).memberships.filter(by_group=request.group)
                     typepad.client.complete_batch()
 
                     try:
@@ -87,7 +87,7 @@ def moderate(request):
 
                         try:
                             user_membership.block()
-                            ban_list.append(asset.user_id)
+                            ban_list.append(queue.user_id)
                         except Exception, ex:
                             print "got an exception: %s" % str(ex)
                             raise ex
@@ -95,10 +95,10 @@ def moderate(request):
                     except IndexError:
                         pass # no membership exists; ignore ban
 
-            if asset.asset_id:
+            if queue.asset_id:
                 # we need to remove from typepad
                 typepad.client.batch_request()
-                tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
+                tp_asset = typepad.Asset.get_by_url_id(queue.asset_id)
                 typepad.client.complete_batch()
 
                 if tp_asset.source:
@@ -107,7 +107,7 @@ def moderate(request):
 
                 tp_asset.delete()
 
-            content = asset.content
+            content = queue.content
             if content is not None:
                 if content.attachment is not None and content.attachment.name:
                     # delete the attachment ourselves; this handles
@@ -122,29 +122,29 @@ def moderate(request):
                             raise ex
                     content.attachment = None
                     content.save()
-            asset.delete()
+            queue.delete()
             success.append(asset_id)
 
         elif action == 'view':
-            if asset.status in (Asset.MODERATED, Asset.SPAM):
-                content = AssetContent.objects.get(asset=asset)
+            if queue.status in (Queue.MODERATED, Queue.SPAM):
+                content = QueueContent.objects.get(queue=queue)
                 data = json.loads(content.data)
                 # supplement with a fake author member, since this isn't
                 # populated into the POSTed data for pre-moderation/spam assets
                 data['author'] = {
-                    'displayName': asset.user_display_name,
+                    'displayName': queue.user_display_name,
                     'links': [{
                         'rel': 'avatar',
-                        'href': asset.user_userpic,
+                        'href': queue.user_userpic,
                         'width': 50,
                         'height': 50
                     }]
                 }
                 tp_asset = typepad.Asset.from_dict(data)
-                tp_asset.published = asset.ts
+                tp_asset.published = queue.ts
             else:
                 typepad.client.batch_request()
-                tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
+                tp_asset = typepad.Asset.get_by_url_id(queue.asset_id)
                 typepad.client.complete_batch()
 
             event = typepad.Event()

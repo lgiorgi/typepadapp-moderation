@@ -18,15 +18,15 @@
     {% if total_flagged %}
         <p>
     {% if total_flagged|greaterthan:1 %}
-            There are <a href="{% url flagged %}">{{ total_flagged }}
+            There are <a href="{% url moderation_flagged %}">{{ total_flagged }}
             posts</a> that have been flagged for review.
     {% else %}
-            There is <a href="{% url flagged %}">1 post</a> that has been
+            There is <a href="{% url moderation_flagged %}">1 post</a> that has been
             flagged for review.
     {% endif %}
         </p>
         <p class="help">
-            Please select &ldquo;<strong><a href="{% url flagged %}">
+            Please select &ldquo;<strong><a href="{% url moderation_flagged %}">
             Flagged Posts</a></strong>&rdquo; to Approve or Delete the
             post. Flagged posts may contain offensive or inappropriate content
             but are still displayed on your site until you take
@@ -37,14 +37,14 @@
     {% if total_pending %}
         <p>
     {% if total_pending|greaterthan:1 %}
-            There are <a href="{% url pending %}">{{ total_pending }}
+            There are <a href="{% url moderation_pending %}">{{ total_pending }}
             posts</a> that are held for approval.
     {% else %}
-            There is <a href="{% url pending %}">1 post</a> held for approval.
+            There is <a href="{% url moderation_pending %}">1 post</a> held for approval.
     {% endif %}
         </p>
         <p class="help">
-            Please select &ldquo;<strong><a href="{% url pending %}">
+            Please select &ldquo;<strong><a href="{% url moderation_pending %}">
             Awaiting Moderation</a></strong>&rdquo; to Approve or Delete
             the post. All new posts awaiting moderation will not be displayed
             until you approve them!
@@ -54,14 +54,14 @@
     {% if total_spam %}
         <p>
     {% if total_spam|greaterthan:1 %}
-            There are <a href="{% url spam %}">{{ total_spam }} posts</a> that
+            There are <a href="{% url moderation_spam %}">{{ total_spam }} posts</a> that
             were identified as spam.
     {% else %}
-            There is <a href="{% url spam %}">1 post</a> that was identified as spam.
+            There is <a href="{% url moderation_spam %}">1 post</a> that was identified as spam.
     {% endif %}
         </p>
         <p class="help">
-            Please select &ldquo;<strong><a href="{% url spam %}">Spam
+            Please select &ldquo;<strong><a href="{% url moderation_spam %}">Spam
             Posts</a></strong>&rdquo; to Approve or Delete the post. Spam
             posts will not show on your site unless you approve them. Remember
             to delete all spam posts from time to time to prevent the queue
