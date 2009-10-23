@@ -34,6 +34,9 @@ from moderation import models
 
 class ModerationContext(object):
 
+    dialogs_template = 'moderation/dialogs.html'
+    moderate_template = 'moderation/bits/moderate.html'
+
     def __init__(self, request):
         self.request = request
 
