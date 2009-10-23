@@ -99,6 +99,8 @@ def moderate(request):
                     # we need to remove from typepad
                     tp_asset = typepad.Asset.get_by_url_id(asset.asset_id)
                     tp_asset.delete()
+                    # FIXME: check for a comment asset; send parent if available
+                    signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
 
             content = asset.content
             if content is not None:

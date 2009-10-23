@@ -34,6 +34,8 @@ from django.db import models
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 
+from typepadapp import signals
+
 from oauth import oauth
 
 try:
@@ -176,11 +178,13 @@ class Asset(models.Model):
                 post = tp_models.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
                 typepad.client.complete_batch()
                 post.comments.post(tp_asset)
+                signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP, parent=post)
             else:
                 if content.attachment.name:
                     tp_asset.save(group=tp_models.GROUP, file=content.attachment)
                 else:
                     tp_asset.save(group=tp_models.GROUP)
+                signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP)
 
             self.delete()
 
