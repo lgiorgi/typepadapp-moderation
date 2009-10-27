@@ -24,11 +24,7 @@
             There is <a href="{% url moderation_flagged %}">1 post</a> that has been
             flagged for review.
     {% endif %}
-        </p>
-        <p class="help">
-            Please select &ldquo;<strong><a href="{% url moderation_flagged %}">
-            Flagged Posts</a></strong>&rdquo; to Approve or Delete the
-            post. Flagged posts may contain offensive or inappropriate content
+            Flagged posts may contain offensive or inappropriate content
             but are still displayed on your site until you take
             action.
         </p>
@@ -42,12 +38,8 @@
     {% else %}
             There is <a href="{% url moderation_pending %}">1 post</a> held for approval.
     {% endif %}
-        </p>
-        <p class="help">
-            Please select &ldquo;<strong><a href="{% url moderation_pending %}">
-            Awaiting Moderation</a></strong>&rdquo; to Approve or Delete
-            the post. All new posts awaiting moderation will not be displayed
-            until you approve them!
+            All new posts awaiting moderation will not be displayed until you
+            approve them!
         </p>
     {% endif %}
 
@@ -59,13 +51,9 @@
     {% else %}
             There is <a href="{% url moderation_spam %}">1 post</a> that was identified as spam.
     {% endif %}
-        </p>
-        <p class="help">
-            Please select &ldquo;<strong><a href="{% url moderation_spam %}">Spam
-            Posts</a></strong>&rdquo; to Approve or Delete the post. Spam
-            posts will not show on your site unless you approve them. Remember
-            to delete all spam posts from time to time to prevent the queue
-            from overflowing.
+            Spam posts will not show on your site unless you approve them.
+            Remember to delete all spam posts from time to time to prevent the
+            queue from overflowing.
         </p>
     {% endif %}
 
