@@ -71,6 +71,7 @@ function moderate(id, action, redirect) {
                 // hide progress display for rows we've processed
                 for (var id in data['success']) {
                     $("#loader-" + data['success'][id]).hide();
+                    $("#item-" + data['success'][id] + ' .cb[type="checkbox"]').attr('checked', false);
                 }
                 // redisplay assets that failed to approve/delete/etc.
                 for (var id in data['fail']) {
@@ -81,8 +82,10 @@ function moderate(id, action, redirect) {
                 var count = parseInt($('#asset-count').html());
                 if (isNaN(count))
                     count = 0;
-                else
+                else {
                     count -= data['success'].length;
+                    if (count < 0) count = 0;
+                }
                 $('#asset-count').html(''+count);
                 // show message if no assets left
                 if (!count) {

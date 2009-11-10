@@ -4,9 +4,19 @@
 {% load typepad_filters %}
 
 {% block content-main %}
-<table cellspacing="0">
+
+{% if page_obj.paginator.count %}
+<p class="help">
+    Please review the posts below. &ldquo;Delete&rdquo; spam posts, which will
+    delete the content and the post will not show up on your TypePad Motion
+    site. If a post is not spam, select &ldquo;Publish&rdquo; to publish the
+    post.
+</p>
+{% endif %}
+
+<table class="data" cellspacing="0" width="100%">
     <tr class="header">
-        <td colspan="4">
+        <td colspan="3">
             {% include "motion/bits/pagination.html" %}
             Spam (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
         </td>
@@ -22,8 +32,8 @@
         </td>
         <td class="item-body">
             <div class="item-actions">
-                <a id="approve-{{ asset.id }}" class="action approve" href="#">Not Spam</a>
-                <a id="delete-{{ asset.id }}" class="action delete" href="#">Delete</a>
+                <a id="approve-{{ asset.id }}" class="action approve" href="">Not Spam</a>
+                <a id="delete-{{ asset.id }}" class="action delete" href="">Delete</a>
                 <a id="ban-{{ asset.id }}" class="action ban" href="">Ban User</a>
             </div>
             <p class="item-meta"><span class="type-icon {{ asset.asset_type }}-icon"></span> <a href="{{ asset.get_user_url }}">{{ asset.user_display_name }}</a> posted {{ asset.ts|pithy_timesince:"on" }}:</p>
@@ -32,14 +42,14 @@
     </tr>
 
     <tr id="loader-{{ asset.id }}" class="item" style="display: none;">
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
         </td>
     </tr>
     {% endfor %}
 
     <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
-        <td class="info" colspan="4">
+        <td class="info" colspan="3">
             {% trans "There are no spam posts. Hurrah!" %}
         </td>
     </tr>
@@ -48,12 +58,22 @@
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>
-        <td colspan="3">
+        <td colspan="2">
             {% include "motion/bits/pagination.html" %}
-            <a class="action approve" id="approve-checked" href="">Not Spam</a>
-            <a class="action delete" id="delete-checked" href="">Delete</a>
-            <a class="action ban" id="ban-checked" href="">Ban User</a>
+            <a class="action approve" id="approve-checked" href="{% url moderation_spam %}">Not Spam</a>
+            <a class="action delete" id="delete-checked" href="{% url moderation_spam %}">Delete</a>
+            <a class="action ban" id="ban-checked" href="{% url moderation_spam %}">Ban User</a>
         </td>
     </tr>
 </table>
+
+{% if page_obj.paginator.count %}
+<p class="help">
+    To approve or delete multiple posts at a time, select multiple posts using
+    the check boxes to the left of each post and the global action buttons at
+    the bottom of the page. You can also select all posts by selecting the
+    check box at the bottom of the page.
+</p>
+{% endif %}
+
 {% endblock %}

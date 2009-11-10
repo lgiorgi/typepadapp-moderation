@@ -3,6 +3,7 @@
 <div id="flag-dialog" title="Flag this post">
     <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}" style="width: 400px">
         <input type="hidden" id="flag-dialog-asset-id" name="asset-id" value="" />
+        <input type="hidden" name="return_to" value="{{ request.path }}" />
         <fieldset>
             <p>Please select a category that most closely reflects your
             concern about this post.</p>
@@ -48,8 +49,30 @@
                 "Cancel": function() { $(this).dialog("close"); }
             }
         });
+        $('#flag-dialog-form').ajaxForm({
+            beforeSubmit: function() {
+                $("#flag-dialog").dialog('close');
+                var xid = $("#flag-dialog-asset-id").val();
+                var btn = $("#flag-" + xid + " button");
+                btn.hide().next().show();
+            },
+            success: function(responseText, statusText) {
+                if (responseText == "OK") {
+                    var xid = $("#flag-dialog-asset-id").val();
+                    $("#flag-" + xid + " button").addClass("flagged");
+                } else {
+                    alert(responseText);
+                }
+                var btn = $("#flag-" + xid + " button");
+                btn.show().next().hide();
+            }
+        });
     });
     function flagasset(xid) {
+        if ($("#flag-" + xid + " button").hasClass("flagged"))
+            return;
+        // reset form
+        $(':input','#flag-dialog-form').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
         $("#flag-dialog-asset-id").val(xid);
         $("#flag-dialog").dialog('open');
     }

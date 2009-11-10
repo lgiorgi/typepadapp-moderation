@@ -27,30 +27,36 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import os
-from django.conf.urls.defaults import *
+from django.utils.functional import lazy
+
+from moderation import models
 
 
-app_path = os.path.dirname(__file__)
-media_dir = os.path.join(app_path, 'static')
+class ModerationContext(object):
 
-urlpatterns = patterns('moderation.views',
-    url(r'^/?$', 'DashboardView', name='moderation_home'),
-    url(r'^/pending/?$', 'PendingView', name='moderation_pending'),
-    url(r'^/pending/page/(?P<page>\d+)/?$', 'PendingView'),
-    url(r'^/flagged/?$', 'FlaggedView', name='moderation_flagged'),
-    url(r'^/flagged/page/(?P<page>\d+)/?$', 'FlaggedView'),
-    url(r'^/flagged/flags/(?P<assetid>\w+)/?$', 'FlaggedFlagsView', name='moderation_flags'),
-    url(r'^/flagged/flags/(?P<assetid>\w+)/page/(?P<page>\d+)/?$', 'FlaggedFlagsView'),
-    url(r'^/spam/?$', 'SpamView', name='moderation_spam'),
-    url(r'^/spam/page/(?P<page>\d+)/?$', 'SpamView'),
-    url(r'^/report$', 'moderation_report', name='moderation_report'),
-    url(r'^/upload$', 'browser_upload', name='moderated_upload_url'),
-)
-urlpatterns += patterns('moderation.ajax',
-    url(r'^/ajax/moderate/?$', 'moderate', name='moderate'),
-)
-urlpatterns += patterns('',
-    url(r'^/static/(?P<path>.*)/?$', 'django.views.static.serve',
-        kwargs={ 'document_root': media_dir }),
-)
+    dialogs_template = 'moderation/dialogs.html'
+    moderate_template = 'moderation/bits/moderate.html'
+
+    def __init__(self, request):
+        self.request = request
+
+    def count(self):
+        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+            return models.Queue.objects.count()
+        return 0
+
+    def user_is_blocked(self):
+        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+            return False
+        user_can_post, moderated = models.user_can_post(self.request.user,
+            self.request.META['REMOTE_ADDR'])
+        return not user_can_post
+
+
+def globals(request):
+    """
+    Provides additional global context settings based on the authenticated
+    user.
+    """
+
+    return { 'moderation': ModerationContext(request) }

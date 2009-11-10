@@ -2,46 +2,67 @@
 {% load typepad_filters %}
 
 {% block content-main %}
-    <h1>Welcome to Motion moderation!</h1>
+
+    <h1>Welcome to the TypePad Motion Moderation dashboard!</h1>
+
+    <p>This screen is only available to the site Moderator. From this
+    dashboard, you can review all posts that have been flagged as
+    inappropriate by your community members, review all new posts that are in
+    the moderation queue awaiting your review, and review/delete any posts
+    that TypePad Anti-Spam (if enabled) has identified as suspected spam.</p>
+
+    <div id="dashboard-summary">
 
     {% if total_flagged or total_pending or total_spam %}
 
-    {% if total_flagged %}{% spaceless %}
-    <p>
+    {% if total_flagged %}
+        <p>
     {% if total_flagged|greaterthan:1 %}
-    There are <a href="{% url flagged %}">{{ total_flagged }} posts</a>
-    that have been flagged for review.
+            There are <a href="{% url moderation_flagged %}">{{ total_flagged }}
+            posts</a> that have been flagged for review.
     {% else %}
-    There is <a href="{% url flagged %}">1 post</a> that has been flagged for review.
+            There is <a href="{% url moderation_flagged %}">1 post</a> that has been
+            flagged for review.
     {% endif %}
-    </p>
-    {% endspaceless %}{% endif %}
+            Flagged posts may contain offensive or inappropriate content
+            but are still displayed on your site until you take
+            action.
+        </p>
+    {% endif %}
 
-    {% if total_pending %}{% spaceless %}
-    <p>
+    {% if total_pending %}
+        <p>
     {% if total_pending|greaterthan:1 %}
-    There are <a href="{% url pending %}">{{ total_pending }} posts</a>
-    that are held for approval.
+            There are <a href="{% url moderation_pending %}">{{ total_pending }}
+            posts</a> that are held for approval.
     {% else %}
-    There is <a href="{% url pending %}">1 post</a> held for approval.
+            There is <a href="{% url moderation_pending %}">1 post</a> held for approval.
     {% endif %}
-    </p>
-    {% endspaceless %}{% endif %}
+            All new posts awaiting moderation will not be displayed until you
+            approve them!
+        </p>
+    {% endif %}
 
-    {% if total_spam %}{% spaceless %}
-    <p>
+    {% if total_spam %}
+        <p>
     {% if total_spam|greaterthan:1 %}
-    There are <a href="{% url spam %}">{{ total_spam }} posts</a> that were
-    identified as spam.
+            There are <a href="{% url moderation_spam %}">{{ total_spam }} posts</a> that
+            were identified as spam.
     {% else %}
-    There is <a href="{% url spam %}">1 post</a> that was identified as spam.
+            There is <a href="{% url moderation_spam %}">1 post</a> that was identified as spam.
     {% endif %}
-    </p>
-    {% endspaceless %}{% endif %}
+            Spam posts will not show on your site unless you approve them.
+            Remember to delete all spam posts from time to time to prevent the
+            queue from overflowing.
+        </p>
+    {% endif %}
 
     {% else %}
 
-    <p>Looks like there's nothing to do!</p>
+        <p>Looks like there's nothing to do!</p>
 
     {% endif %}
+
+    </div>
+
 {% endblock %}
