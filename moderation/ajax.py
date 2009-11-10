@@ -90,6 +90,8 @@ def moderate(request):
 
                         try:
                             user_membership.block()
+                            signals.member_banned.send(sender=moderate,
+                                membership=user_membership, group=request.group)
                             ban_list.append(queue.user_id)
                         except Exception, ex:
                             print "got an exception: %s" % str(ex)
