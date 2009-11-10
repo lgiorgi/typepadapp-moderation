@@ -174,7 +174,7 @@ def moderation_report(request):
     asset = typepad.Asset.get_by_url_id(asset_id)
     try:
         typepad.client.complete_batch()
-    except:
+    except typepad.Asset.NotFound:
         if request.is_ajax():
             return HttpResponse(_("The requested post was not found."), mimetype='text/plain')
         else:

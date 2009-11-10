@@ -35,8 +35,11 @@ from django.template import RequestContext
 import simplejson as json
 
 import typepad
+
 from typepadapp.decorators import ajax_required
 from typepadapp.models import User
+from typepadapp import signals
+
 from moderation.models import Queue, Flag, QueueContent
 
 
@@ -99,16 +102,21 @@ def moderate(request):
                 # we need to remove from typepad
                 typepad.client.batch_request()
                 tp_asset = typepad.Asset.get_by_url_id(queue.asset_id)
-                typepad.client.complete_batch()
+                try:
+                    typepad.client.complete_batch()
+                except typepad.Asset.NotFound:
+                    # already deleted on TypePad...
+                    tp_asset = None
 
-                if tp_asset.source:
-                    fail.append(asset_id)
-                    continue
+                if tp_asset:
+                    if tp_asset.source:
+                        fail.append(asset_id)
+                        continue
 
-                tp_asset.delete()
+                    tp_asset.delete()
 
-                # FIXME: check for a comment asset; send parent if available
-                signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
+                    # FIXME: check for a comment asset; send parent if available
+                    signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
 
             content = queue.content
             if content is not None:
