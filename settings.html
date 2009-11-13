@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Settings &mdash; moderation v1.0a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="moderation v1.0a1 documentation" href="index.html" />
+    <link rel="prev" title="moderation – Moderation for TypePad Motion" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="moderation – Moderation for TypePad Motion"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">moderation v1.0a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="settings">
+<h1>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h1>
+<p>The Moderation app for TypePad Motion provides several optional settings you
+can configure to customize the behavior to suit your community. The following
+Django settings are specific to the Moderation app. You can assign them in
+your Django project&#8217;s <tt class="docutils literal"><span class="pre">settings.py</span></tt> file.</p>
+<div class="section" id="use-moderation">
+<h2>USE_MODERATION<a class="headerlink" href="#use-moderation" title="Permalink to this headline">¶</a></h2>
+<p>This is the master switch for the Moderation app. This setting must be
+assigned a &#8220;True&#8221; value in order for the Moderation app to run properly. In
+addition to enabling this setting, the Moderation app should be added to the
+list of Django&#8217;s <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>. For a typical Motion installation, you
+should add this block to your Django project&#8217;s <tt class="docutils literal"><span class="pre">settings.py</span></tt> file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">USE_MODERATION</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="k">if</span> <span class="n">USE_MODERATION</span><span class="p">:</span>
+    <span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;moderation&#39;</span><span class="p">,)</span> <span class="o">+</span> <span class="n">INSTALLED_APPS</span>
+
+    <span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;moderation.context_processors.globals&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="c"># Any other Moderation-specific settings should be</span>
+    <span class="c"># assigned here...</span>
+</pre></div>
+</div>
+<p>By conditioning the other settings for Moderation in this way, you can easily
+enable and disable the whole feature by changing the <tt class="docutils literal"><span class="pre">USE_MODERATION</span></tt>
+setting.</p>
+<p>You will also need to customize your <tt class="docutils literal"><span class="pre">urls.py</span></tt> file for your project to
+include the urls necessary for Moderation. The following block can be added to
+your <tt class="docutils literal"><span class="pre">urls.py</span></tt> module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+
+<span class="c">## (your existing urlpatterns would be here)</span>
+
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">USE_MODERATION</span><span class="p">:</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,(</span><span class="s">r&#39;^moderation&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;moderation.urls&#39;</span><span class="p">)))</span>
+    <span class="n">upload_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">UPLOAD_PATH</span><span class="p">)</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^static/</span><span class="si">%s</span><span class="s">/(?P&lt;path&gt;.*)/?$&#39;</span> \
+        <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">UPLOAD_PATH</span><span class="p">,</span>
+        <span class="s">&#39;django.views.static.serve&#39;</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;document_root&#39;</span><span class="p">:</span> <span class="n">upload_path</span> <span class="p">}))</span>
+</pre></div>
+</div>
+<p>Note that if you are using Apache and mod_wsgi, you will need to create an
+Alias directive to serve static files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Alias</span> <span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">moderation</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">moderation</span><span class="o">/</span><span class="n">static</span>
+</pre></div>
+</div>
+<p>You also need an Alias for serving uploaded files (substitute &#8220;uploads&#8221; with
+the any custom value you assign to the <tt class="docutils literal"><span class="pre">UPLOAD_PATH</span></tt> Moderation app
+setting):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Alias</span> <span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">uploads</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">media_root</span><span class="o">/</span><span class="n">uploads</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="moderate-some">
+<h2>MODERATE_SOME<a class="headerlink" href="#moderate-some" title="Permalink to this headline">¶</a></h2>
+<p>Set to &#8220;True&#8221; to enable selective moderation (by default, this is False). When
+this is off, all posts made by users are moderated and held for a moderator to
+approve before appearing on the site. When <tt class="docutils literal"><span class="pre">MODERATE_SOME</span></tt> is enabled, posts
+are not pre-moderated globally; admins can selectively flag users (from their
+Motion profile page) so their posts are moderated. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_SOME</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="moderate-types">
+<h2>MODERATE_TYPES<a class="headerlink" href="#moderate-types" title="Permalink to this headline">¶</a></h2>
+<p>Enabling this feature will cause only specific post types to be pre-moderated.
+Post types are &#8220;post&#8221;, &#8220;photo&#8221;, &#8220;link&#8221;, &#8220;audio&#8221;, &#8220;video&#8221; and &#8220;comment&#8221;.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;photo&#39;</span><span class="p">,</span> <span class="s">&#39;audio&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will cause the Moderation app to only pre-moderate photo and audio posts.</p>
+<p>If you want to pre-moderate everything except for comments, you can configure
+this setting like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;photo&#39;</span><span class="p">,</span> <span class="s">&#39;link&#39;</span><span class="p">,</span> <span class="s">&#39;audio&#39;</span><span class="p">,</span> <span class="s">&#39;video&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="upload-path">
+<h2>UPLOAD_PATH<a class="headerlink" href="#upload-path" title="Permalink to this headline">¶</a></h2>
+<p>This setting is required and must identify a directory that is relative to the
+<tt class="docutils literal"><span class="pre">MEDIA_ROOT</span></tt> setting. This will be the path where photo and audio files are
+uploaded when pre-moderation is in effect. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">UPLOAD_PATH</span> <span class="o">=</span> <span class="s">&#39;uploads&#39;</span>
+</pre></div>
+</div>
+<p>The directory that this path references must exist and must be writeable by
+the Django process account. If it is not, uploads will fail. Be sure to test
+file uploads in general after enabling moderation.</p>
+<p>Also note that your <tt class="docutils literal"><span class="pre">MEDIA_ROOT</span></tt> setting may require a full file path; in
+some cases this is assigned a value with a relative portion in it
+(&#8216;/path/to/../dir&#8217;); if you are having trouble with moderation and uploaded
+files, try assigning a full path for <tt class="docutils literal"><span class="pre">MEDIA_ROOT</span></tt>.</p>
+</div>
+<div class="section" id="report-options">
+<h2>REPORT_OPTIONS<a class="headerlink" href="#report-options" title="Permalink to this headline">¶</a></h2>
+<p>A list of canned reasons for flagging a given post or comment. This list is
+shown to users when they click the &#8220;flag&#8221; icon shown for posts. Each element
+here is an array with two values: the label for the option and an optional
+threshold value. The threshold identifies the number of end-user reports that
+will cause a post or comment to be suppressed (hidden for posts, grayed-out
+for comments) on the site. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">REPORT_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s">&#39;Poor taste&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s">&#39;Sexual material&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s">&#39;Copyright infringement&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s">&#39;Rick-roll&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="p">[</span><span class="s">&#39;Terms of service violation&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="s">&#39;Admin: Immediately suppress this post&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that any reason that is prefixed with &#8220;Admin:&#8221; is only shown to
+administrators. It is not recommended to assign a low suppression threshold
+for options shown to regular users, but it is useful for administrator-only
+options, since it will have immediate effect at hiding the post from the site,
+but not deleting it altogether.</p>
+<p>You can also hide any option by using a &#8220;-&#8221; at the start of the label. This
+will prevent it from showing as an option to the user, but it will still be
+available for reference for existing moderation reports that used it.</p>
+</div>
+<div class="section" id="typepad-antispam-api-key">
+<h2>TYPEPAD_ANTISPAM_API_KEY<a class="headerlink" href="#typepad-antispam-api-key" title="Permalink to this headline">¶</a></h2>
+<p>This setting will enable the use of the TypePad AntiSpam service for filtering
+incoming posts and comments for spam. This should be assigned a TypePad
+AntiSpam API key; these are free for unlimited use. You can obtain an API key
+from the <a class="reference external" href="http://antispam.typepad.com/">TypePad AntiSpam web site</a>.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TYPEPAD_ANITSPAM_API_KEY</span> <span class="o">=</span> <span class="s">&quot;your_api_key&quot;</span>
+</pre></div>
+</div>
+<p>To use this setting, you will need to install the Python <tt class="docutils literal"><span class="pre">akismet</span></tt> module.
+You can install this module by running the following command on your web
+server:</p>
+<div class="highlight-python"><pre>sudo easy_install akismet</pre>
+</div>
+<p>Note that administrators and featured users are not subject to antispam
+scoring and filtering.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Settings</a><ul>
+<li><a class="reference external" href="#use-moderation">USE_MODERATION</a></li>
+<li><a class="reference external" href="#moderate-some">MODERATE_SOME</a></li>
+<li><a class="reference external" href="#moderate-types">MODERATE_TYPES</a></li>
+<li><a class="reference external" href="#upload-path">UPLOAD_PATH</a></li>
+<li><a class="reference external" href="#report-options">REPORT_OPTIONS</a></li>
+<li><a class="reference external" href="#typepad-antispam-api-key">TYPEPAD_ANTISPAM_API_KEY</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">moderation</span></tt> – Moderation for TypePad Motion</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/settings.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="moderation – Moderation for TypePad Motion"
+             >previous</a> |</li>
+        <li><a href="index.html">moderation v1.0a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Six Apart.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+    </div>
+  </body>
+</html>
