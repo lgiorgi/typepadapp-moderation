@@ -47,6 +47,22 @@
 can configure to customize the behavior to suit your community. The following
 Django settings are specific to the Moderation app. You can assign them in
 your Django project&#8217;s <tt class="docutils literal"><span class="pre">settings.py</span></tt> file.</p>
+<p>There are two settings that deserve special mention: <tt class="docutils literal"><span class="pre">MODERATE_BY_USER</span></tt> and
+<tt class="docutils literal"><span class="pre">MODERATE_TYPES</span></tt>. These settings configure the Moderation app to selectively
+moderate posted content, instead of moderating everything. When you set one or
+the other, the effect is obvious, but when used together it is not obvious how
+they work together. Consider this configuration:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;photo&#39;</span><span class="p">,</span> <span class="s">&#39;audio&#39;</span><span class="p">,</span> <span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;link&#39;</span><span class="p">,</span> <span class="s">&#39;video&#39;</span><span class="p">)</span>
+<span class="n">MODERATE_BY_USER</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>In this case, we are specifying that the Moderation app should pre-moderate
+everything but comments. But we are also configuring to moderate specific
+users. In this case, the user moderation feature takes precedent: all posts,
+regardless of type &#8211; even comments &#8211; will be moderated if a user is marked
+to be moderated (you set this status on their Motion member profile page). And
+for members that are not specifically marked for moderation, they will be
+subject to pre-moderation for non-comment posts.</p>
 <div class="section" id="use-moderation">
 <h2>USE_MODERATION<a class="headerlink" href="#use-moderation" title="Permalink to this headline">¶</a></h2>
 <p>This is the master switch for the Moderation app. This setting must be
@@ -97,14 +113,14 @@ setting):</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="moderate-some">
-<h2>MODERATE_SOME<a class="headerlink" href="#moderate-some" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="moderate-by-user">
+<h2>MODERATE_BY_USER<a class="headerlink" href="#moderate-by-user" title="Permalink to this headline">¶</a></h2>
 <p>Set to &#8220;True&#8221; to enable selective moderation (by default, this is False). When
 this is off, all posts made by users are moderated and held for a moderator to
-approve before appearing on the site. When <tt class="docutils literal"><span class="pre">MODERATE_SOME</span></tt> is enabled, posts
-are not pre-moderated globally; admins can selectively flag users (from their
-Motion profile page) so their posts are moderated. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_SOME</span> <span class="o">=</span> <span class="bp">True</span>
+approve before appearing on the site. When <tt class="docutils literal"><span class="pre">MODERATE_BY_USER</span></tt> is enabled,
+posts are not pre-moderated globally; admins can selectively flag users (from
+their Motion profile page) so their posts are moderated. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MODERATE_BY_USER</span> <span class="o">=</span> <span class="bp">True</span>
 </pre></div>
 </div>
 </div>
@@ -196,7 +212,7 @@ scoring and filtering.</p>
             <ul>
 <li><a class="reference external" href="">Settings</a><ul>
 <li><a class="reference external" href="#use-moderation">USE_MODERATION</a></li>
-<li><a class="reference external" href="#moderate-some">MODERATE_SOME</a></li>
+<li><a class="reference external" href="#moderate-by-user">MODERATE_BY_USER</a></li>
 <li><a class="reference external" href="#moderate-types">MODERATE_TYPES</a></li>
 <li><a class="reference external" href="#upload-path">UPLOAD_PATH</a></li>
 <li><a class="reference external" href="#report-options">REPORT_OPTIONS</a></li>

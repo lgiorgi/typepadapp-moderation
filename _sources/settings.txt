@@ -6,6 +6,23 @@ can configure to customize the behavior to suit your community. The following
 Django settings are specific to the Moderation app. You can assign them in
 your Django project's ``settings.py`` file.
 
+There are two settings that deserve special mention: ``MODERATE_BY_USER`` and
+``MODERATE_TYPES``. These settings configure the Moderation app to selectively
+moderate posted content, instead of moderating everything. When you set one or
+the other, the effect is obvious, but when used together it is not obvious how
+they work together. Consider this configuration::
+
+    MODERATE_TYPES = ('photo', 'audio', 'post', 'link', 'video')
+    MODERATE_BY_USER = True
+
+In this case, we are specifying that the Moderation app should pre-moderate
+everything but comments. But we are also configuring to moderate specific
+users. In this case, the user moderation feature takes precedent: all posts,
+regardless of type -- even comments -- will be moderated if a user is marked
+to be moderated (you set this status on their Motion member profile page). And
+for members that are not specifically marked for moderation, they will be
+subject to pre-moderation for non-comment posts.
+
 
 USE_MODERATION
 --------------
@@ -59,16 +76,16 @@ setting)::
     Alias /static/uploads /path/to/media_root/uploads
 
 
-MODERATE_SOME
--------------
+MODERATE_BY_USER
+----------------
 
 Set to "True" to enable selective moderation (by default, this is False). When
 this is off, all posts made by users are moderated and held for a moderator to
-approve before appearing on the site. When ``MODERATE_SOME`` is enabled, posts
-are not pre-moderated globally; admins can selectively flag users (from their
-Motion profile page) so their posts are moderated. Example::
+approve before appearing on the site. When ``MODERATE_BY_USER`` is enabled,
+posts are not pre-moderated globally; admins can selectively flag users (from
+their Motion profile page) so their posts are moderated. Example::
 
-    MODERATE_SOME = True
+    MODERATE_BY_USER = True
 
 
 MODERATE_TYPES
