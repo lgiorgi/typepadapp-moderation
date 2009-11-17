@@ -3,7 +3,7 @@ Adding moderation to Motion
 
 Get the moderation app:
 
-    pip -E $VIRTUAL_ENV install -e git://github.com/sixapart/moderation.git#egg=moderation
+    pip -E $VIRTUAL_ENV install -e git://github.com/sixapart/typepadapp-moderation.git#egg=typepadapp_moderation
 
 
 Add the following to your urls.py:

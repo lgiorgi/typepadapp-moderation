@@ -34,8 +34,8 @@ a TypePad Motion community.
 
 """
 
-__version__ = '1.0a1'
-__date__ = '3 November 2009'
+__version__ = '1.0'
+__date__ = '16 November 2009'
 __author__ = 'Six Apart Ltd.'
 __credits__ = """Brad Choate
 Leah Culver
