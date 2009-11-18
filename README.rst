@@ -3,7 +3,7 @@ Adding moderation to Motion
 
 Get the moderation app:
 
-    pip -E $VIRTUAL_ENV install -e git://github.com/sixapart/moderation.git#egg=moderation
+    pip -E $VIRTUAL_ENV install -e git://github.com/sixapart/typepadapp-moderation.git#egg=typepadapp_moderation
 
 
 Add the following to your urls.py:
@@ -39,7 +39,7 @@ And include the following in your local_settings.py module:
         
         ## For selective moderation; enabling this feature will default
         ## moderation so that it is only done for specific users.
-        # MODERATE_SOME = True
+        # MODERATE_BY_USER = True
         
         ## For selective moderation; enabling this feature will default
         ## moderation so that it is only done for these specific post types.

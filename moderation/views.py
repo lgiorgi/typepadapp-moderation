@@ -354,42 +354,45 @@ def moderation_status(request, post=None):
     if request.user.is_superuser or request.user.is_featured_member:
         return Queue.APPROVED
 
+    moderate_everything = True
+
     user_moderation = False
-    if hasattr(settings, 'MODERATE_SOME') \
-        and settings.MODERATE_SOME:
+    if hasattr(settings, 'MODERATE_BY_USER') and settings.MODERATE_BY_USER:
         user_moderation = True
+        moderate_everything = False
 
     type_moderation = False
-    if hasattr(settings, 'MODERATE_TYPES') \
-        and len(settings.MODERATE_TYPES) > 0:
-        type_moderation = True
+    post_type = (post and post.type_id) or request.GET.get('post_type')
+    if hasattr(settings, 'MODERATE_TYPES'):
+        if (settings.MODERATE_TYPES is not None) and \
+            len(settings.MODERATE_TYPES) > 0:
+            type_moderation = True
+        moderate_everything = False
 
-    # default assumption for USE_MODERATION is to moderate all;
-    # if MODERATE_SOME is True, use selective moderation
-    if not (user_moderation or type_moderation):
-        # we pre-moderate unconditionally
+    # if neither MODERATE_BY_USER or MODERATE_TYPES is specified, we presume to
+    # moderate everything
+    if moderate_everything:
         return Queue.MODERATED
+
+    # OK, we are NOT moderating everything; so now we have to prove moderation
+    # by testing if this post type and/or user is moderated
+    moderate = False
 
     # check for user/ip blocks
     if user_moderation:
-        can_post, moderated = user_can_post(request.user, request.META['REMOTE_ADDR'])
+        can_post, moderate = user_can_post(request.user, request.META['REMOTE_ADDR'])
         if not can_post:
             if not request.is_ajax():
                 request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
             # we can't allow this user, so no post status
             return None
-        if moderated:
-            # We can stop checking; this user has been specifically moderated
-            return Queue.MODERATED
 
-    if type_moderation and (post is not None):
+    if type_moderation and (post_type is not None) and not moderate:
         # if this setting is available, only moderate for specified types;
         # otherwise, moderate everything
-        if not post.type_id in settings.MODERATE_TYPES:
-            # this post type does not require moderation
-            return Queue.APPROVED
+        moderate = post_type in settings.MODERATE_TYPES
 
-    return Queue.MODERATED
+    return (moderate and Queue.MODERATED) or Queue.APPROVED
 
 
 def is_spam(request, post):
