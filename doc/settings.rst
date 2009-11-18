@@ -104,6 +104,10 @@ this setting like this::
 
     MODERATE_TYPES = ('post', 'photo', 'link', 'audio', 'video')
 
+If you want to disable pre-moderation altogether, you can assign None:
+
+    MODERATE_TYPES = None
+
 
 UPLOAD_PATH
 -----------
