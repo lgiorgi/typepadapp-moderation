@@ -1,15 +1,22 @@
 {% load generic_filters %}
+{% load i18n %}
+
 <div style="display:none">
 <div id="flag-dialog" title="Flag this post">
-    <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}" style="width: 400px">
+    <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}">
         <input type="hidden" id="flag-dialog-asset-id" name="asset-id" value="" />
         <input type="hidden" name="return_to" value="{{ request.path }}" />
+
+        <p>{% blocktrans %}
+        Please select a category that most closely reflects your
+        concern about this post.
+        {% endblocktrans %}</p>
+
         <fieldset>
-            <p>Please select a category that most closely reflects your
-            concern about this post.</p>
-            <ul>
-                <select name="reason">
-                    <option value="">Select one...</option>
+            <label for="flag-dialog-reason">{% trans "Reason" %}</label>
+            <ul style="display: inline">
+                <select id="flag-dialog-reason" name="reason">
+                    <option value="">{% trans "Select one..." %}</option>
                     {% for option in settings.report_options %}
                     {% if not option.0|regex_search:"^-" %}
                     {% if request.user.is_superuser %}
@@ -25,25 +32,41 @@
             </ul>
         </fieldset>
         <fieldset>
-            <label for="flag-dialog-note">Note for moderator:</label>
+            <label for="flag-dialog-note">{% trans "Note for moderator" %}</label>
             <input id="flag-dialog-note" name="note" type="text" maxlength="140" />
         </fieldset>
-        <p>Our moderator will review your request and determine if it
+
+        <p><em>{% blocktrans %}
+        Our moderator will review your request and determine if it
         violates any of our guidelines or is inappropriate. Abusing this
-        feature may results in your account being permanently banned from this
-        site.</p>
+        feature may result in your account being permanently banned from this
+        site.
+        {% endblocktrans %}</em></p>
     </form>
 </div>
 </div>
 
+<style type="text/css">
+    #flag-dialog label {
+        width: 100px;
+        display: block;
+        float: left;
+        text-align: right;
+        margin-right: 10px;
+    }
+    #flag-dialog-reason, #flag-dialog-note {
+        width: 250px;
+        clear: both;
+    }
+</style>
 <script type="text/javascript">
     $(document).ready(function() {
         $("#flag-dialog").dialog({
             modal: true,
             autoOpen: false,
             resizable: false,
-            width: 420,
-            height: 220,
+            width: 450,
+            height: 250,
             buttons: {
                 "Flag": function() { $("#flag-dialog-form").submit(); },
                 "Cancel": function() { $(this).dialog("close"); }
