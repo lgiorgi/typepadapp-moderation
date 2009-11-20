@@ -41,6 +41,7 @@ from typepadapp.models import User
 from typepadapp import signals
 
 from moderation.models import Queue, Flag, QueueContent
+from moderation import models
 
 
 @ajax_required
@@ -100,6 +101,8 @@ def moderate(request):
                     except IndexError:
                         pass # no membership exists; ignore ban
 
+            tp_asset = None
+
             if queue.asset_id:
                 # we need to remove from typepad
                 typepad.client.batch_request()
@@ -117,9 +120,6 @@ def moderate(request):
 
                     tp_asset.delete()
 
-                    # FIXME: check for a comment asset; send parent if available
-                    signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
-
             content = queue.content
             if content is not None:
                 if content.attachment is not None and content.attachment.name:
@@ -135,8 +135,13 @@ def moderate(request):
                             raise ex
                     content.attachment = None
                     content.save()
+
             queue.delete()
             success.append(asset_id)
+
+            # FIXME: check for a comment asset; send parent if available
+            if tp_asset is not None:
+                signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
 
         elif action == 'view':
             if queue.status in (Queue.MODERATED, Queue.SPAM):
@@ -188,3 +193,6 @@ def moderate(request):
         "message": res
     })
     return http.HttpResponse(data)
+
+
+signals.asset_deleted.connect(models.clear_local_data_for_asset)

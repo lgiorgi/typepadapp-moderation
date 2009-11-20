@@ -325,3 +325,14 @@ def user_can_post(user, ip_addr):
             return True, True
 
     return True, False
+
+def clear_local_data_for_asset(sender, instance=None, **kwargs):
+    """Django signal handler for deleting all local records referring to the
+    TypePad asset passed as the ``instance`` keyword argument."""
+
+    if instance is None: return
+
+    asset_id = instance.url_id
+    Approved.objects.filter(asset_id=asset_id).delete()
+    Queue.objects.filter(asset_id=asset_id).delete()
+    Flag.objects.filter(tp_asset_id=asset_id).delete()
