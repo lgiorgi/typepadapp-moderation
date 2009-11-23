@@ -1,6 +1,7 @@
 {% load generic_filters %}
 {% load i18n %}
 
+{% if moderation and request.user.is_authenticated %}
 <div style="display:none">
 <div id="flag-dialog" title="Flag this post">
     <form id="flag-dialog-form" method="POST" action="{% url moderation_report %}">
@@ -100,3 +101,4 @@
         $("#flag-dialog").dialog('open');
     }
 </script>
+{% endif %}
