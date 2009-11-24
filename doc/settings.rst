@@ -40,6 +40,9 @@ should add this block to your Django project's ``settings.py`` file::
 
         TEMPLATE_CONTEXT_PROCESSORS += ('moderation.context_processors.globals', )
 
+        # Path for uploaded files; relative to MEDIA_ROOT
+        UPLOAD_PATH = 'uploads'
+
         # Any other Moderation-specific settings should be
         # assigned here...
 
