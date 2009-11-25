@@ -39,7 +39,7 @@ except Exception:
 
 setup(
     name='typepadapp-moderation',
-    version='1.0',
+    version='1.0.1',
     description='Moderation panel for TypePad applications.',
     long_description=long_description,
     author='Six Apart',
