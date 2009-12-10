@@ -139,7 +139,6 @@ def moderate(request):
             queue.delete()
             success.append(asset_id)
 
-            # FIXME: check for a comment asset; send parent if available
             if tp_asset is not None:
                 signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
 
