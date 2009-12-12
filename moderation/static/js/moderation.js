@@ -126,7 +126,7 @@ function view(id) {
 
 $(document).ready(function () {
     $('.approve').click(function() {
-        id = $(this).attr('id');
+        var id = $(this).attr('id');
         if (id.indexOf('-checked') >= 0) {
             if (!confirm('Approve the selected items?'))
                 return false;
@@ -136,7 +136,7 @@ $(document).ready(function () {
     });
 
     $('.delete').click(function() {
-        id = $(this).attr('id');
+        var id = $(this).attr('id');
         if (id.indexOf('-checked') >= 0) {
             if (!confirm('Delete the selected items?'))
                 return false;
@@ -148,7 +148,7 @@ $(document).ready(function () {
     });
 
     $('.ban').click(function() {
-        id = $(this).attr('id');
+        var id = $(this).attr('id');
         if (id.indexOf('-checked') >= 0) {
             if (!confirm('Ban users who posted these items (also deletes selected posts)?'))
                 return false;
