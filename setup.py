@@ -39,7 +39,7 @@ except Exception:
 
 setup(
     name='typepadapp-moderation',
-    version='1.0.1',
+    version='1.0.2',
     description='Moderation panel for TypePad applications.',
     long_description=long_description,
     author='Six Apart',
@@ -50,5 +50,5 @@ setup(
     provides=['moderation'],
     include_package_data=True,
     zip_safe=False,
-    requires=['Django(>=1.1.1)', 'typepadapp(>=1.1)', 'akismet(>=0.2.0)'],
+    requires=['Django(>=1.1.1)', 'typepadapp(>=1.1.1)', 'akismet(>=0.2.0)'],
 )
