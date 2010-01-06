@@ -1,0 +1,149 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-06 11:41-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: views.py:179
+msgid "The requested post was not found."
+msgstr ""
+
+#: views.py:205 views.py:207
+msgid "This post has been approved by the site moderator."
+msgstr ""
+
+#: views.py:261
+msgid "Thank you for your report."
+msgstr ""
+
+#: views.py:342
+msgid "Thank you. Your post is awaiting moderation by the Administrator."
+msgstr ""
+
+#: views.py:386
+msgid "Sorry; you are not allowed to post to this site."
+msgstr ""
+
+#: templates/moderation/base.html:7
+msgid "Moderation"
+msgstr ""
+
+#: templates/moderation/base.html:49
+msgid "Return to"
+msgstr ""
+
+#: templates/moderation/base.html:50
+msgid "Sign out"
+msgstr ""
+
+#: templates/moderation/base.html:52
+msgid "Moderation for"
+msgstr ""
+
+#: templates/moderation/base.html:63
+msgid "Dashboard"
+msgstr ""
+
+#: templates/moderation/base.html:64
+msgid "Awaiting Moderation"
+msgstr ""
+
+#: templates/moderation/base.html:65
+msgid "Flagged Posts"
+msgstr ""
+
+#: templates/moderation/base.html:68
+msgid "Spam Posts"
+msgstr ""
+
+#: templates/moderation/flagged.html:57
+msgid "There are no flagged posts awaiting moderation."
+msgstr ""
+
+#: templates/moderation/flags.html:48
+msgid "This post has no flags."
+msgstr ""
+
+#: templates/moderation/pending.html:53
+msgid "There are no posts awaiting moderation."
+msgstr ""
+
+#: templates/moderation/spam.html:53
+msgid "There are no spam posts. Hurrah!"
+msgstr ""
+
+#: templates/moderation/assets/body/comment.html:10
+#, python-format
+msgid ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> commented on an <a href=\"%(url)s\">%(type)s post by %(author)"
+"s</a> <abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</"
+"abbr>.\n"
+"        "
+msgstr ""
+
+#: templates/moderation/assets/body/comment.html:14
+#, python-format
+msgid ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> commented on a <a href=\"%(url)s\">%(type)s by %(author)s</a> "
+"<abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</abbr>.\n"
+"        "
+msgstr ""
+
+#: templates/moderation/assets/body/photo.html:38
+msgid "original"
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:11
+msgid ""
+"\n"
+"        Please select a category that most closely reflects your\n"
+"        concern about this post.\n"
+"        "
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:17
+msgid "Reason"
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:20
+msgid "Select one..."
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:36
+msgid "Note for moderator"
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:40
+msgid ""
+"\n"
+"        Our moderator will review your request and determine if it\n"
+"        violates any of our guidelines or is inappropriate. Abusing this\n"
+"        feature may result in your account being permanently banned from "
+"this\n"
+"        site.\n"
+"        "
+msgstr ""
+
+#: templates/moderation/base/bits/moderate.html:6
+msgid "Flag this content for review"
+msgstr ""
+
+#: templates/moderation/base/bits/moderate.html:6
+msgid "Flag"
+msgstr ""
