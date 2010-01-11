@@ -15,22 +15,20 @@
 
         <fieldset>
             <label for="flag-dialog-reason">{% trans "Reason" %}</label>
-            <ul style="display: inline">
-                <select id="flag-dialog-reason" name="reason">
-                    <option value="">{% trans "Select one..." %}</option>
-                    {% for option in settings.report_options %}
-                    {% if not option.0|regex_search:"^-" %}
-                    {% if request.user.is_superuser %}
-                    <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
-                    {% else %}
-                    {% if not option.0|regex_search:"^Admin" %}
-                    <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
-                    {% endif %}
-                    {% endif %}
-                    {% endif %}
-                    {% endfor %}
-                </select>
-            </ul>
+            <select id="flag-dialog-reason" name="reason">
+                <option value="">{% trans "Select one..." %}</option>
+                {% for option in settings.report_options %}
+                {% if not option.0|regex_search:"^-" %}
+                {% if request.user.is_superuser %}
+                <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
+                {% else %}
+                {% if not option.0|regex_search:"^Admin" %}
+                <option value="{{ forloop.counter0 }}">{{ option.0 }}</option>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </select>
         </fieldset>
         <fieldset>
             <label for="flag-dialog-note">{% trans "Note for moderator" %}</label>
@@ -54,10 +52,10 @@
         float: left;
         text-align: right;
         margin-right: 10px;
+        clear: both;
     }
     #flag-dialog-reason, #flag-dialog-note {
         width: 250px;
-        clear: both;
     }
 </style>
 <script type="text/javascript">
