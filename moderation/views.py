@@ -339,7 +339,10 @@ def moderate_post(request, post):
     content.ip_addr = request.META['REMOTE_ADDR']
     content.save()
 
-    request.flash.add('notices', _('Thank you. Your post is awaiting moderation by the Administrator.'))
+    if post.type_id == 'comment':
+        request.flash.add('notices', _('Thank you. Your comment is awaiting moderation by the Administrator.'))
+    else:
+        request.flash.add('notices', _('Thank you. Your post is awaiting moderation by the Administrator.'))
 
     return True
 
