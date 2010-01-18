@@ -303,7 +303,9 @@ def moderate_post(request, post):
     # save a copy of this content to our database
 
     # do this check first of all to avoid any possible spam filtering
-    if request.user.is_superuser or request.user.is_featured_member:
+    if (request.user.is_authenticated() and \
+        request.user.is_group_admin(request.group)) or \
+        request.user.is_featured_member:
         return False
 
     post_status = moderation_status(request, post)
@@ -354,7 +356,9 @@ def moderation_status(request, post=None):
     moderation status of the user in context (whether they are blocked or not)."""
 
     # don't moderate admins or featured users. ever.
-    if request.user.is_superuser or request.user.is_featured_member:
+    if (request.user.is_authenticated() and \
+        request.user.is_group_admin(request.group)) or \
+        request.user.is_featured_member:
         return Queue.APPROVED
 
     moderate_everything = True
