@@ -27,16 +27,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import time
 import simplejson as json
 from urlparse import urlparse
+from distutils.version import StrictVersion
 
 from django.db import models
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 
+from oauth import oauth
+
+import typepadapp
 from typepadapp import signals
 
-from oauth import oauth
 
 try:
     settings.USE_MODERATION
@@ -336,3 +340,47 @@ def clear_local_data_for_asset(sender, instance=None, **kwargs):
     Approved.objects.filter(asset_id=asset_id).delete()
     Queue.objects.filter(asset_id=asset_id).delete()
     Flag.objects.filter(tp_asset_id=asset_id).delete()
+
+
+def member_probation(sender, instance, group, **kwargs):
+
+    if instance.is_superuser:
+        return
+
+    if StrictVersion(typepadapp.__version__) >= StrictVersion('1.2'):
+        # works with motion 1.2
+        if instance.is_admin_for_group(group):
+            return
+
+    if hasattr(settings, 'PROBATION_HOURS'):
+        if time.gmtime().tm_hour not in settings.PROBATION_HOURS:
+            return
+
+    member_id = instance.xid
+
+    try:
+        b = Blacklist.objects.get(user_id=member_id)
+    except Blacklist.DoesNotExist:
+        b = Blacklist()
+        b.user_id = member_id
+        b.user_display_name = instance.display_name
+        # this causes the user to be moderated; not blocked
+        b.block = False
+        b.note = "On probation"
+        b.save()
+
+def asset_created(sender, instance, **kwargs):
+    user_id = instance.author.xid
+    try:
+        b = Blacklist.objects.get(user_id=user_id)
+        if (not b.block) and (b.note == "On probation"):
+            # does not automatically restore an account that
+            # submitted a post that was blocked; only does so for
+            # moderated posts
+            b.delete()
+    except Blacklist.DoesNotExist:
+        pass
+
+if getattr(settings, 'NEW_USER_PROBATION', False):
+    signals.member_joined.connect(member_probation)
+    signals.asset_created.connect(asset_created)

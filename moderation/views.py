@@ -28,12 +28,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import re
+import time
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user
 from django.conf import settings
+from django.core.cache import cache
 
 import typepad
 from typepadapp.views.base import TypePadView
@@ -347,6 +349,76 @@ def moderate_post(request, post):
     return True
 
 
+def strip_accents(string):
+    import unicodedata
+    return unicodedata.normalize('NFKD', unicode(string)).encode('ASCII', 'ignore')
+
+
+def keyword_moderation(request, post):
+    """Scans post content for blocking/moderating keywords.
+    
+    Returns True to moderate based on PROFANITIES_LIST setting.
+    """
+
+    if not hasattr(settings, 'PROFANITIES_LIST'):
+        return False
+
+    moderate_patterns = getattr(settings, 'PROFANITIES_LIST_PATTERNS', ())
+
+    if post is None:
+        return False
+
+    text = post.content
+    if text is None:
+        return False
+
+    text = strip_accents(text)
+    words = text.split()
+    for word in text.split():
+        # strip out symbols; convert to lowercase.
+        # turns "I-D-I-O-T" into "idiot"
+        word = re.sub('[^a-z]', '', word.lower())
+        for kw in settings.PROFANITIES_LIST:
+            if kw == word:
+                return True
+
+        # strips common suffixes
+        word = re.sub('(er|ist|ing|ed|ity|ize|ise|ate|able|ible)$', '', word)
+        for kw in moderate_patterns:
+            if isinstance(kw, basestring):
+                if kw == word:
+                    return True
+                if word.startswith(kw):
+                    return True
+                if word.endswith(kw):
+                    return True
+            else:
+                if kw.search(word):
+                    return True
+    return False
+
+
+def post_throttle(request):
+    """Tests request to determine if user is exceeding the post throttle controls.
+
+    Returns True when the post should be moderated, False if not.
+    """
+
+    for setting_name, period, attr in [('POSTS_PER_MINUTE', 60, 'tm_min'),
+                                       ('POSTS_PER_HOUR', 3600, 'tm_hour')]:
+        if hasattr(settings, setting_name):
+            m = getattr(settings, setting_name)
+            cache_key = '%s:%s:%d' % (setting_name.lower(),
+                request.user.xid, getattr(time.gmtime(), attr))
+            c = cache.get(cache_key) or 0
+            if c >= m:
+                return True
+            else:
+                # posts_per_minute:xid:hr/mn = count+1
+                cache.set(cache_key, c + 1, period)
+    return False
+
+
 def moderation_status(request, post=None):
     """Returns a status for the post; None if the post is not permitted at all.
 
@@ -390,10 +462,21 @@ def moderation_status(request, post=None):
             # we can't allow this user, so no post status
             return None
 
-    if type_moderation and (post_type is not None) and not moderate:
+    if (not moderate) and type_moderation and (post_type is not None):
         # if this setting is available, only moderate for specified types;
         # otherwise, moderate everything
         moderate = post_type in settings.MODERATE_TYPES
+
+    # this means that even types unspecified in MODERATE_TYPES will
+    # be subject to keyword moderation
+    if (not moderate) and keyword_moderation(request, post):
+        moderate = True
+
+    # this means that even types unspecified in MODERATE_TYPES will
+    # be subject to post throttling (except comments; we specifically
+    # permit comments to be posted without throttling)
+    if (not moderate) and ((post_type is not None) and (post_type != 'comment')):
+        moderate = post_throttle(request)
 
     return (moderate and Queue.MODERATED) or Queue.APPROVED
 
