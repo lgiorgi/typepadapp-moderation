@@ -271,7 +271,7 @@ def browser_upload(request):
         user = get_user(request)
         typepad.client.complete_batch()
 
-        request.user = user
+        request.typepad_user = user
 
     if not request.method == 'POST':
         status = moderation_status(request)
@@ -284,7 +284,7 @@ def browser_upload(request):
         url = 'for(;;);%s' % url # no third party sites allowed.
         return HttpResponse(url)
 
-    if not request.user.is_authenticated():
+    if not request.typepad_user.is_authenticated():
         return HttpResponseForbidden("invalid request")
 
     data = json.loads(request.POST['asset'])
@@ -303,7 +303,7 @@ def moderate_post(request, post):
     # save a copy of this content to our database
 
     # do this check first of all to avoid any possible spam filtering
-    if request.user.is_superuser or request.user.is_featured_member:
+    if request.typepad_user.is_superuser or request.typepad_user.is_featured_member:
         return False
 
     post_status = moderation_status(request, post)
@@ -323,9 +323,9 @@ def moderate_post(request, post):
 
     queue = Queue()
     queue.asset_type = post.type_id
-    queue.user_id = request.user.url_id
-    queue.user_display_name = request.user.display_name
-    queue.user_userpic = request.user.userpic
+    queue.user_id = request.typepad_user.url_id
+    queue.user_display_name = request.typepad_user.display_name
+    queue.user_userpic = request.typepad_user.userpic
     queue.summary = unicode(post)
     queue.status = post_status
     queue.save()
@@ -354,7 +354,7 @@ def moderation_status(request, post=None):
     moderation status of the user in context (whether they are blocked or not)."""
 
     # don't moderate admins or featured users. ever.
-    if request.user.is_superuser or request.user.is_featured_member:
+    if request.typepad_user.is_superuser or request.typepad_user.is_featured_member:
         return Queue.APPROVED
 
     moderate_everything = True
@@ -383,7 +383,7 @@ def moderation_status(request, post=None):
 
     # check for user/ip blocks
     if user_moderation:
-        can_post, moderate = user_can_post(request.user, request.META['REMOTE_ADDR'])
+        can_post, moderate = user_can_post(request.typepad_user, request.META['REMOTE_ADDR'])
         if not can_post:
             if not request.is_ajax():
                 request.flash.add('notices', _('Sorry; you are not allowed to post to this site.'))
@@ -423,7 +423,7 @@ def is_spam(request, post):
             'user_agent': request.META.get('HTTP_USER_AGENT', ''),
             'referrer': request.META.get('HTTP_REFERER', ''),
             'comment_type': 'comment',
-            'comment_author': request.user.display_name.encode('utf-8'),
+            'comment_author': request.typepad_user.display_name.encode('utf-8'),
         }
 
         content = post.content
