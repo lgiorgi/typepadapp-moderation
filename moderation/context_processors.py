@@ -41,14 +41,14 @@ class ModerationContext(object):
         self.request = request
 
     def count(self):
-        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+        if self.request.typepad_user.is_authenticated() and self.request.typepad_user.is_superuser:
             return models.Queue.objects.count()
         return 0
 
     def user_is_blocked(self):
-        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+        if self.request.typepad_user.is_authenticated() and self.request.typepad_user.is_superuser:
             return False
-        user_can_post, moderated = models.user_can_post(self.request.user,
+        user_can_post, moderated = models.user_can_post(self.request.typepad_user,
             self.request.META['REMOTE_ADDR'])
         return not user_can_post
 
