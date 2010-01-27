@@ -413,7 +413,7 @@ def is_spam(request, post):
 
     ak = akismet.Akismet(
         key=settings.TYPEPAD_ANTISPAM_API_KEY,
-        blog_url=settings.FRONTEND_URL
+        blog_url=request.build_absolute_uri('/')
     )
     ak.baseurl = 'api.antispam.typepad.com/1.1/'
 
