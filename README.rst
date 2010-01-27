@@ -6,12 +6,12 @@ Get the moderation app:
     pip -E $VIRTUAL_ENV install -e git://github.com/sixapart/typepadapp-moderation.git#egg=typepadapp_moderation
 
 
-Add the following to your urls.py:
+Add the following to your urls.py::
 
     (r'^moderation', include('moderation.urls')),
 
 
-And include the following in your local_settings.py module:
+And include the following in your local_settings.py module::
 
     USE_MODERATION = True
     
