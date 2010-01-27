@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Six Apart Ltd.
+# Copyright (c) 2009-2010 Six Apart Ltd.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -75,28 +75,24 @@ def moderate(request):
         elif action in ('delete', 'ban'):
             # outright delete it?? or do we have a status for this?
             if action == 'ban':
-                if asset.user_id not in ban_list:
+                if queue.user_id not in ban_list:
                     # also ban this user
                     typepad.client.batch_request()
                     user_memberships = User.get_by_url_id(queue.user_id).memberships.filter(by_group=request.group)
                     typepad.client.complete_batch()
 
+                    user_membership = user_memberships[0]
+
+                    if user_membership.is_admin():
+                        # cannot ban/unban another admin
+                        fail.append(asset_id)
+                        continue
+
                     try:
-                        user_membership = user_memberships[0]
-
-                        if user_membership.is_admin():
-                            # cannot ban/unban another admin
-                            fail.append(asset_id)
-                            continue
-
-                        try:
-                            user_membership.block()
-                            signals.member_banned.send(sender=moderate,
-                                membership=user_membership, group=request.group)
-                            ban_list.append(queue.user_id)
-                        except Exception, ex:
-                            print "got an exception: %s" % str(ex)
-                            raise ex
+                        user_membership.block()
+                        signals.member_banned.send(sender=moderate,
+                            membership=user_membership, group=request.group)
+                        ban_list.append(queue.user_id)
 
                     except IndexError:
                         pass # no membership exists; ignore ban
