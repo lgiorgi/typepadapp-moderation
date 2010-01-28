@@ -44,25 +44,25 @@ function toggleDetail(id) {
 
 // Moderate action
 function moderate(id, action, redirect) {
-    var asset_id = id.split('-')[1];
-    var asset_ids = [];
-    if (asset_id == 'checked') {
+    var item_id = id.split('-')[1];
+    var item_ids = [];
+    if (item_id == 'checked') {
         $(".item .cb:checked").each(function() {
-            asset_id = $(this).val();
-            $("#loader-" + asset_id).show();
-            $("#item-" + asset_id).hide();
-            asset_ids.push(asset_id);
+            item_id = $(this).val();
+            $("#loader-" + item_id).show();
+            $("#item-" + item_id).hide();
+            item_ids.push(item_id);
         });
     }
     else {
-        $("#loader-" + asset_id).show();
-        $("#item-" + asset_id).hide();
-        asset_ids = [ asset_id ];
+        $("#loader-" + item_id).show();
+        $("#item-" + item_id).hide();
+        item_ids = [ item_id ];
     }
     $.ajax({
         type: "POST",
         url: settings.moderate_url,
-        data: { "asset_id": asset_ids, "action": action },
+        data: { "item_id": item_ids, "action": action },
         dataType: "json",
         success: function(data) {
             if (redirect) {
@@ -73,24 +73,24 @@ function moderate(id, action, redirect) {
                     $("#loader-" + data['success'][id]).hide();
                     $("#item-" + data['success'][id] + ' .cb[type="checkbox"]').attr('checked', false);
                 }
-                // redisplay assets that failed to approve/delete/etc.
+                // redisplay items that failed to approve/delete/etc.
                 for (var id in data['fail']) {
                     $("#loader-" + data['fail'][id]).hide();
                     $("#item-" + data['fail'][id]).show();
                 }
-                // adjust asset count
-                var count = parseInt($('#asset-count').html());
+                // adjust item count
+                var count = parseInt($('#item-count').html());
                 if (isNaN(count))
                     count = 0;
                 else {
                     count -= data['success'].length;
                     if (count < 0) count = 0;
                 }
-                $('#asset-count').html(''+count);
+                $('#item-count').html(''+count);
                 // show message if no assets left
                 if (!count) {
-                    $('#assets-empty').show();
-                    $('#assets-footer').show();
+                    $('#items-empty').show();
+                    $('#items-footer').show();
                 }
                 // show flash
                 $('#flash-notice').html(data['message']);
@@ -99,9 +99,9 @@ function moderate(id, action, redirect) {
         },
         error: function(xhr, txtStatus, errorThrown) {
             alert('An error occurred: ' + xhr.status + ' -- ' + xhr.statusText);
-            for (var id in asset_ids) {
-                $("#loader-" + asset_ids[id]).hide();
-                $("#item-" + asset_ids[id]).show();
+            for (var id in item_ids) {
+                $("#loader-" + item_ids[id]).hide();
+                $("#item-" + item_ids[id]).show();
             }
         }
     });
@@ -112,7 +112,7 @@ function view(id) {
     $.ajax({
         type: "POST",
         url: settings.moderate_url,
-        data: {"asset_id": asset_id, "action": "view"},
+        data: {"item_id": asset_id, "action": "view"},
         success: function(data){
             // decrement asset count
             $('#view-detail').html(data);
@@ -156,6 +156,28 @@ $(document).ready(function () {
             return false;
         }
         moderate(id, 'ban', $(this).attr('href'));
+        return false;
+    });
+
+    $('.ban-user').click(function() {
+        var id = $(this).attr('id');
+        if (id.indexOf('-checked') >= 0) {
+            if (!confirm('Ban selected users (does not affect posts already made to the group)?'))
+                return false;
+        } else if (!confirm('Are you sure you want to ban this user (does not affect posts already made to the group)?')) {
+            return false;
+        }
+        moderate(id, 'ban_user', $(this).attr('href'));
+        return false;
+    });
+
+    $('.approve-user').click(function() {
+        var id = $(this).attr('id');
+        if (id.indexOf('-checked') >= 0) {
+            if (!confirm('Approve the selected users?'))
+                return false;
+        }
+        moderate(id, 'approve_user', $(this).attr('href'));
         return false;
     });
 

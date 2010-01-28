@@ -150,13 +150,13 @@ a.action {
 .view {
     background-color: #555;
 }
-.approve {
+.approve, .approve-user {
     background-color: #8CCA40;
 }
 .delete {
     background-color: #C75C6A;
 }
-.ban {
+.ban, .ban-user {
     background-color: #EFE14A;
 }
 #content {

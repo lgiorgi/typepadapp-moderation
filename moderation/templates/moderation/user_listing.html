@@ -1,0 +1,87 @@
+{% extends "moderation/base.html" %}
+{% load i18n %}
+{% load date_filters %}
+{% load typepad_filters %}
+
+{% block content-main %}
+
+<p class="help">
+    {% ifequal view "moderation_blocked_users" %}
+    The following members have been given a <strong>blocked</strong> status,
+    which allows them to still be a member of the group, but they have no
+    rights to post or comment.
+    {% else %}
+    The following members have been given a <strong>moderated</strong> status,
+    which causes their posts to be held for approval before appearing on the
+    site.
+    {% endifequal %}
+</p>
+
+<table class="data" cellspacing="0" width="100%">
+    <tr class="header">
+        <td colspan="2">
+            {% include "motion/bits/pagination.html" %}
+            {% ifequal view "moderation_blocked_users" %}
+            Blocked Users
+            {% else %}
+            Moderated Users
+            {% endifequal %}
+            {% if page_obj.paginator.count %}
+            (<span id="item-count">{{ page_obj.paginator.count }}</span>)
+            {% endif %}
+        </td>
+    </tr>
+
+    {% for u in page_obj.object_list %}
+    <tr id="item-{{ u.user_id }}" class="item">
+        <td class="item-checkbox">
+            <input class="select cb" type="checkbox" value="{{ u.user_id }}" name="id" />
+        </td>
+        <!-- <td class="item-userpic">
+            <a href="{{ u.get_user_url }}"><img src="{{ u.user_userpic }}" alt="{{ u.user_display_name }}" height="50" width="50" /></a>
+        </td> -->
+        <td class="item-body">
+            <div class="item-actions">
+                <a id="approve-{{ u.user_id }}" class="action approve-user" href="">Approve User</a>
+                <a id="ban-{{ u.user_id }}" class="action ban-user" href="">Ban User</a>
+            </div>
+            <a href="{{ u.get_user_url }}" target="_blank">{{ u.user_display_name }}</a>{% if u.note %} &mdash; <em>{{ u.note }}</em>{% endif %}
+        </td>
+    </tr>
+
+    <tr id="loader-{{ u.user_id }}" class="item" style="display: none;">
+        <td class="info" colspan="2">
+            <img src="/moderation{{ settings.media_url }}images/ajax-loader.gif"/>
+        </td>
+    </tr>
+    {% endfor %}
+
+    <tr id="items-empty" class="item" {% if page_obj.object_list %}style="display: none;"{% endif %}>
+        <td class="info" colspan="2">
+            {% trans "There are no users to display." %}
+        </td>
+    </tr>
+
+    <tr id="items-footer" class="footer" {% if not page_obj.object_list %}style="display: none;"{% endif %}>
+        <td class="item-checkbox">
+            <input type="checkbox" class="check-all" />
+        </td>
+        <td>
+            {% include "motion/bits/pagination.html" %}
+            <a class="action approve-user" id="approve-checked" href="{{ request.path }}">Approve Users</a>
+            <a class="action ban-user" id="ban-checked" href="{{ request.path }}">Ban Users</a>
+        </td>
+    </tr>
+</table>
+
+{% if page_obj.paginator.count %}
+<p class="help">
+    To approve or ban multiple users at a time, select multiple users using
+    the check boxes to the left of each user and the global action buttons at
+    the bottom of the page. You can also select all users by selecting the
+    check box at the bottom of the page (next to the global Approve Users/Ban
+    Users buttons).
+</p>
+{% endif %}
+
+{% endblock %}

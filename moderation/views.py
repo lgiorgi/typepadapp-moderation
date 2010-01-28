@@ -39,6 +39,7 @@ import typepad
 from typepadapp.views.base import TypePadView
 from moderation.models import Queue, Approved, Flag, QueueContent, Blacklist, IPBlock, user_can_post
 from typepadapp.decorators import ajax_required
+from typepadapp import models as tp_models
 
 import simplejson as json
 from datetime import datetime
@@ -158,6 +159,49 @@ class FlaggedFlagsView(TypePadView):
         asset = self.queue
         self.context.update(locals())
         return super(FlaggedFlagsView, self).get(request, *args, **kwargs)
+
+
+class UserListingView(TypePadView):
+    """Lists some users from the Blacklist model.
+    """
+
+    admin_required = True
+    template_name = "moderation/user_listing.html"
+    paginate_by = ITEMS_PER_PAGE
+
+    def select_from_typepad(self, request, view=None):
+        if '/blocked' in request.path:
+            block_status = True
+            view = 'moderation_blocked_users'
+        else:
+            block_status = False
+            view = 'moderation_moderated_users'
+        self.context.update(locals())
+        self.object_list = Blacklist.objects.filter(block=block_status)
+
+        user_fetch = []
+        for u in self.object_list:
+            if u.user_display_name in ('', None):
+                user_fetch.append(u.user_id)
+        if user_fetch:
+            self.context['userdata'] = {}
+            for uid in user_fetch:
+                self.context['userdata'][uid] = tp_models.User.get_by_url_id(uid)
+
+    def get(self, request, *args, **kwargs):
+        if 'userdata' in self.context:
+            for u in self.object_list:
+                if u.user_display_name in ('', None):
+                    uid = u.user_id
+                    if uid in self.context['userdata']:
+                        u.user_display_name = self.context['userdata'][uid].display_name
+                        # we made the mistake of not populating the display
+                        # name when manually moderating/blocking users in
+                        # the first release of the moderation app; this
+                        # will backfill exist rows, avoiding future api hits
+                        # for subsequent views in the moderation panel.
+                        u.save()
+        return super(UserListingView, self).get(request, *args, **kwargs)
 
 
 def moderation_report(request):

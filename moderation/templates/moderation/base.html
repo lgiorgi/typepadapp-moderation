@@ -59,6 +59,8 @@
                     {% url moderation_home as dashboard_url %}
                     {% url moderation_pending as pending_url %}
                     {% url moderation_flagged as flagged_url %}
+                    {% url moderation_moderated as moderated_url %}
+                    {% url moderation_blocked as blocked_url %}
                     <ul>
                         <li {% ifequal request.path dashboard_url %}class="selected"{% endifequal %}><a href="{{ dashboard_url }}">{% trans "Dashboard" %}</a></li>
                         <li {% ifequal request.path pending_url %}class="selected"{% endifequal %}><a href="{{ pending_url }}">{% trans "Awaiting Moderation" %}</a></li>
@@ -66,6 +68,10 @@
                         {% if settings.typepad_antispam_api_key %}
                         {% url moderation_spam as spam_url %}
                         <li {% ifequal request.path spam_url %}class="selected"{% endifequal %}><a href="{{ spam_url }}">{% trans "Spam Posts" %}</a></li>
+                        {% endif %}
+                        {% if settings.moderate_by_user %}
+                        <li {% ifequal request.path blocked_url %}class="selected"{% endifequal %}><a href="{{ blocked_url }}">{% trans "Blocked Users" %}</a></li>
+                        <li {% ifequal request.path moderated_url %}class="selected"{% endifequal %}><a href="{{ moderated_url }}">{% trans "Moderated Users" %}</a></li>
                         {% endif %}
                     </ul>
                 </div>

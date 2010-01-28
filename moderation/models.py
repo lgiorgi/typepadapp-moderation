@@ -277,6 +277,13 @@ class Blacklist(models.Model):
     block = models.BooleanField(default=False)
     note = models.CharField(max_length=255, blank=True)
 
+    def get_user_url(self):
+        """Relative url to the user's member profile page."""
+        try:
+            return reverse('member', args=[self.user_id])
+        except NoReverseMatch:
+            return None
+
 
 # we lookup in this table
 class IPBlock(models.Model):
