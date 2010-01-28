@@ -19,7 +19,7 @@
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
             {% if assets %}<div class="sort">Sort by: <a href="{{ request.path }}?sort=latest">last flagged</a> or <a href="{{ request.path }}?sort=most">most flags</a></div>{% endif %}
-            Flagged Posts (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
+            Flagged Posts (<span id="item-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
 
@@ -52,13 +52,13 @@
     </tr>
     {% endfor %}
 
-    <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
+    <tr id="itemss-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
         <td class="info" colspan="3">
             {% trans "There are no flagged posts awaiting moderation." %}
         </td>
     </tr>
 
-    <tr id="assets-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
+    <tr id="itemss-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>

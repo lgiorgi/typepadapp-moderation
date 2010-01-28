@@ -40,7 +40,7 @@ from typepadapp.decorators import ajax_required
 from typepadapp.models import User
 from typepadapp import signals
 
-from moderation.models import Queue, Flag, QueueContent
+from moderation.models import Queue, Flag, QueueContent, Blacklist
 from moderation import models
 
 
@@ -51,9 +51,9 @@ def moderate(request):
     """
     res = 'OK'
 
-    asset_ids = request.POST.getlist('asset_id')
+    item_ids = request.POST.getlist('item_id')
 
-    if asset_ids is None:
+    if item_ids is None:
         raise http.Http404
 
     action = request.POST.get('action', None)
@@ -61,16 +61,29 @@ def moderate(request):
     success = []
     fail = []
     ban_list = []
-    for asset_id in asset_ids:
-        try:
-            queue = Queue.objects.get(id=asset_id)
-        except:
-            fail.append(asset_id)
-            continue
+    for item_id in item_ids:
+        queue = None
+        user = None
+        if action.endswith('_user'):
+            try:
+                user = Blacklist.objects.get(user_id=item_id)
+            except Blacklist.DoesNotExist:
+                if action == 'approve_user':
+                    success.append(item_id)
+                    continue
+                else:
+                    fail.append(item_id)
+                    continue
+        else:
+            try:
+                queue = Queue.objects.get(id=item_id)
+            except:
+                fail.append(item_id)
+                continue
 
         if action == 'approve':
             queue.approve()
-            success.append(asset_id)
+            success.append(item_id)
 
         elif action in ('delete', 'ban'):
             # outright delete it?? or do we have a status for this?
@@ -81,14 +94,14 @@ def moderate(request):
                     user_memberships = User.get_by_url_id(queue.user_id).memberships.filter(by_group=request.group)
                     typepad.client.complete_batch()
 
-                    user_membership = user_memberships[0]
-
-                    if user_membership.is_admin():
-                        # cannot ban/unban another admin
-                        fail.append(asset_id)
-                        continue
-
                     try:
+                        user_membership = user_memberships[0]
+
+                        if user_membership.is_admin():
+                            # cannot ban/unban another admin
+                            fail.append(item_id)
+                            continue
+
                         user_membership.block()
                         signals.member_banned.send(sender=moderate,
                             membership=user_membership, group=request.group)
@@ -133,7 +146,7 @@ def moderate(request):
                     content.save()
 
             queue.delete()
-            success.append(asset_id)
+            success.append(item_id)
 
             if tp_asset is not None:
                 signals.asset_deleted.send(sender=moderate, instance=tp_asset, group=request.group)
@@ -172,6 +185,32 @@ def moderate(request):
 
             return http.HttpResponse(res)
 
+        elif action == 'ban_user':
+            typepad.client.batch_request()
+            user_memberships = User.get_by_url_id(item_id).memberships.filter(by_group=request.group)
+            typepad.client.complete_batch()
+
+            try:
+                user_membership = user_memberships[0]
+
+                if user_membership.is_admin():
+                    # cannot ban/unban another admin
+                    fail.append(item_id)
+                    continue
+
+                user_membership.block()
+                signals.member_banned.send(sender=moderate,
+                    membership=user_membership, group=request.group)
+                ban_list.append(item_id)
+
+            except IndexError:
+                fail.append(item_id)
+                continue
+
+        elif action == 'approve_user':
+            user.delete()
+            success.append(item_id)
+
         else:
             return http.HttpResponseForbidden('{"message":"invalid request"}')
 
@@ -179,8 +218,10 @@ def moderate(request):
         res = 'You deleted %d post(s).' % len(success)
     elif action == 'approve':
         res = 'You approved %d post(s).' % len(success)
-    elif action == 'ban':
+    elif action in ('ban', 'ban_user'):
         res = 'You banned %d user(s).' % len(ban_list)
+    elif action == 'approve_user':
+        res = 'You approved %d user(s).' % len(success)
 
     data = json.dumps({
         "success": success,

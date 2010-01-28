@@ -18,7 +18,7 @@
     <tr class="header">
         <td colspan="3">
             {% include "motion/bits/pagination.html" %}
-            Awaiting Moderation (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
+            Awaiting Moderation (<span id="item-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
 
@@ -48,13 +48,13 @@
     </tr>
     {% endfor %}
 
-    <tr id="assets-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
+    <tr id="items-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
         <td class="info" colspan="3">
             {% trans "There are no posts awaiting moderation." %}
         </td>
     </tr>
 
-    <tr id="assets-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
+    <tr id="items-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>

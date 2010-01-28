@@ -29,7 +29,7 @@
     <tr class="header">
         <td>
             {% include "motion/bits/pagination.html" %}
-            Flags (<span id="asset-count">{{ page_obj.paginator.count }}</span>)
+            Flags (<span id="item-count">{{ page_obj.paginator.count }}</span>)
         </td>
     </tr>
 
@@ -43,13 +43,13 @@
     </tr>
     {% endfor %}
 
-    <tr id="assets-empty" class="item" {% if flags %}style="display: none;"{% endif %}>
+    <tr id="items-empty" class="item" {% if flags %}style="display: none;"{% endif %}>
         <td class="info">
             {% trans "This post has no flags." %}
         </td>
     </tr>
 
-    <tr id="assets-footer" class="footer" {% if not flags %}style="display: none;"{% endif %}>
+    <tr id="items-footer" class="footer" {% if not flags %}style="display: none;"{% endif %}>
         <td>
             {% include "motion/bits/pagination.html" %}&nbsp;
         </td>
