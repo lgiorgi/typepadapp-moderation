@@ -312,7 +312,7 @@ def moderation_report(request):
 
 
 def browser_upload(request):
-    if not hasattr(request, 'user'):
+    if not hasattr(request, 'typepad_user'):
         typepad.client.batch_request()
         user = get_user(request)
         typepad.client.complete_batch()
