@@ -453,7 +453,7 @@ def post_throttle(request):
         if hasattr(settings, setting_name):
             m = getattr(settings, setting_name)
             cache_key = '%s:%s:%d' % (setting_name.lower(),
-                request.user.xid, getattr(time.gmtime(), attr))
+                request.typepad_user.xid, getattr(time.gmtime(), attr))
             c = cache.get(cache_key) or 0
             if c >= m:
                 return True
