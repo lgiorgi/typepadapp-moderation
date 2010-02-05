@@ -33,11 +33,11 @@ import time
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from django.contrib.auth import get_user
 from django.conf import settings
 from django.core.cache import cache
 
 import typepad
+from typepadapp.auth import get_user
 from typepadapp.views.base import TypePadView
 from moderation.models import Queue, Approved, Flag, QueueContent, Blacklist, IPBlock, user_can_post
 from typepadapp.decorators import ajax_required
