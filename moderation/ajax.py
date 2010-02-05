@@ -29,13 +29,12 @@
 
 from django import http
 from django.conf import settings
-from django.contrib.auth import get_user
 from django.template.loader import render_to_string
 from django.template import RequestContext
+
 import simplejson as json
-
 import typepad
-
+from typepadapp.auth import get_user
 from typepadapp.decorators import ajax_required
 from typepadapp.models import User
 from typepadapp import signals
