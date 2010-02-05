@@ -49,6 +49,16 @@ def moderate(request):
     """
     Moderation actions for the moderation queue. Approve or delete. Return OK.
     """
+
+    if not hasattr(request, 'typepad_user'):
+        typepad.client.batch_request()
+        request.typepad_user = get_user(request)
+        typepad.client.complete_batch()
+
+    if not (request.typepad_user.is_authenticated() and \
+        request.typepad_user.is_superuser):
+        return http.HttpResponseForbidden()
+
     res = 'OK'
 
     item_ids = request.POST.getlist('item_id')
@@ -212,7 +222,8 @@ def moderate(request):
             success.append(item_id)
 
         else:
-            return http.HttpResponseForbidden('{"message":"invalid request"}')
+            return http.HttpResponseForbidden('{"message":"invalid request"}',
+                mimetype='application/json')
 
     if action == 'delete':
         res = 'You deleted %d post(s).' % len(success)
@@ -228,7 +239,7 @@ def moderate(request):
         "fail": fail,
         "message": res
     })
-    return http.HttpResponse(data)
+    return http.HttpResponse(data, mimetype='application/json')
 
 
 signals.asset_deleted.connect(models.clear_local_data_for_asset)
