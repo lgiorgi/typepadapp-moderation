@@ -206,7 +206,10 @@ class UserListingView(TypePadView):
 
 def moderation_report(request):
     asset_id = request.POST['asset-id']
-    reason_code = int(request.POST.get('reason', 0))
+    try:
+        reason_code = int(request.POST.get('reason', 0))
+    except ValueError:
+        reason_code = 0
     note = request.POST.get('note', None)
     return_to = request.POST.get('return_to', reverse('home'))
     return_to = re.sub('.*?/', '/', return_to)
