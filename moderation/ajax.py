@@ -133,10 +133,6 @@ def moderate(request):
                     tp_asset = None
 
                 if tp_asset:
-                    if tp_asset.source:
-                        fail.append(asset_id)
-                        continue
-
                     tp_asset.delete()
 
             content = queue.content
