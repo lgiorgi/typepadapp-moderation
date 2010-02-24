@@ -1,5 +1,6 @@
 {% load generic_filters %}
 {% load i18n %}
+{% load withblock %}
 
 {% if moderation and request.typepad_user.is_authenticated %}
 <div style="display:none">
@@ -67,8 +68,8 @@
             width: 450,
             height: 250,
             buttons: {
-                "Flag": function() { $("#flag-dialog-form").submit(); },
-                "Cancel": function() { $(this).dialog("close"); }
+                "{% withblock %}{{ _("Flag")|escapejs }}{% as flag_str %}{{ flag_str }}{% endwithblock %}": function() { $("#flag-dialog-form").submit(); },
+                "{% withblock %}{{ _("Cancel")|escapejs }}{% as cancel_str %}{{ cancel_str }}{% endwithblock %}": function() { $(this).dialog("close"); }
             }
         });
         $('#flag-dialog-form').ajaxForm({
