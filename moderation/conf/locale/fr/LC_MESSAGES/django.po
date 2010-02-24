@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-06 11:41-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: views.py:179
+msgid "The requested post was not found."
+msgstr "La note demandée ne peut être trouvée"
+
+#: views.py:205 views.py:207
+msgid "This post has been approved by the site moderator."
+msgstr "Votre note a été approuvée par le modérateur du site."
+
+#: views.py:261
+msgid "Thank you for your report."
+msgstr "Merci de votre retour."
+
+#: views.py:342
+msgid "Thank you. Your post is awaiting moderation by the Administrator."
+msgstr "Merci. Votre note est en attente de modération par l'administrateur."
+
+#: views.py:386
+msgid "Sorry; you are not allowed to post to this site."
+msgstr "Désolé, vous n'êtes pas autorisé à créer une note sur ce site."
+
+#: templates/moderation/base.html:7
+msgid "Moderation"
+msgstr "Modération"
+
+#: templates/moderation/base.html:49
+msgid "Return to"
+msgstr "Aller à"
+
+#: templates/moderation/base.html:50
+msgid "Sign out"
+msgstr "Se déconnecter"
+
+#: templates/moderation/base.html:52
+msgid "Moderation for"
+msgstr "Modération pour"
+
+#: templates/moderation/base.html:63
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: templates/moderation/base.html:64
+msgid "Awaiting Moderation"
+msgstr "En attente de modération"
+
+#: templates/moderation/base.html:65
+msgid "Flagged Posts"
+msgstr "Notes marquées"
+
+#: templates/moderation/base.html:68
+msgid "Spam Posts"
+msgstr "Notes de spam"
+
+#: templates/moderation/flagged.html:57
+msgid "There are no flagged posts awaiting moderation."
+msgstr "Pas de note marquée en attente de modération"
+
+#: templates/moderation/flags.html:48
+msgid "This post has no flags."
+msgstr "Cette note n'est pas marquée"
+
+#: templates/moderation/pending.html:53
+msgid "There are no posts awaiting moderation."
+msgstr "Pas de note en attente de modération"
+
+#: templates/moderation/spam.html:53
+msgid "There are no spam posts. Hurrah!"
+msgstr "Pas de notes de spam. Hourah !"
+
+#: templates/moderation/assets/body/comment.html:10
+#, python-format
+msgid ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> commented on an <a href=\"%(url)s\">%(type)s post by %(author)"
+"s</a> <abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</"
+"abbr>.\n"
+"        "
+msgstr ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> a laissé un commentaire sur une <a href=\"%(url)s\">%(type)s note de %(author)"
+"s</a> <abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</"
+"abbr>.\n"
+"        "
+
+#: templates/moderation/assets/body/comment.html:14
+#, python-format
+msgid ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> commented on a <a href=\"%(url)s\">%(type)s by %(author)s</a> "
+"<abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</abbr>.\n"
+"        "
+msgstr ""
+"\n"
+"            <span class=\"vcard author\"><a href=\"%(author_url)s\">%(name)"
+"s</a></span> a laissé un commentaire sur le fichier <a href=\"%(url)s\">%(type)s de %(author)s</a> "
+"<abbr class=\"published\" title=\"%(published)s\">%(timestamp)s</abbr>.\n"
+"        "
+
+#: templates/moderation/assets/body/photo.html:38
+msgid "original"
+msgstr "original"
+
+#: templates/moderation/base/dialogs.html:11
+msgid ""
+"\n"
+"        Please select a category that most closely reflects your\n"
+"        concern about this post.\n"
+"        "
+msgstr ""
+"\n"
+"        Merci de sélectionner une catégorie qui reflète le plus précisément ce que vous reprochez à cette note.\n"
+"       \n"
+"        "
+
+#: templates/moderation/base/dialogs.html:17
+msgid "Reason"
+msgstr "Raison"
+
+#: templates/moderation/base/dialogs.html:20
+msgid "Select one..."
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:36
+msgid "Note for moderator"
+msgstr ""
+
+#: templates/moderation/base/dialogs.html:40
+msgid ""
+"\n"
+"        Our moderator will review your request and determine if it\n"
+"        violates any of our guidelines or is inappropriate. Abusing this\n"
+"        feature may result in your account being permanently banned from "
+"this\n"
+"        site.\n"
+"        "
+msgstr ""
+"\n"
+"        Notre modérateur va vérifier votre requête pour confirmer si elle viole nos conditions d'utilisations ou si elle n'est pas convenable.\n"
+"        Abuser de cette\n"
+"        fonctionnalité peut résulter dans le blocage de votre compte sur ce site de façon permanente.\n"
+"        "
+
+#: templates/moderation/base/bits/moderate.html:6
+msgid "Flag this content for review"
+msgstr "Marquer ce contenu "
+
+#: templates/moderation/base/bits/moderate.html:6
+msgid "Flag"
+msgstr "Marquer"
