@@ -19,6 +19,12 @@ Unreleased
 * Changed user notification for moderated comments.
 
 
+1.0.3 (2010-3-30)
+-----------------
+
+* Updates for forward compatibility with the TypePad API.
+
+
 1.0.2 (2009-12-16)
 ------------------
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Six Apart Ltd.
+# Copyright (c) 2009-2010 Six Apart Ltd.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@ a TypePad Motion community.
 
 """
 
-__version__ = '1.0.2'
-__date__ = '16 December 2009'
+__version__ = '1.0.3'
+__date__ = '30 March 2010'
 __author__ = 'Six Apart Ltd.'
 __credits__ = """Brad Choate
 Leah Culver"""
