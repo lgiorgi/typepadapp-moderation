@@ -559,7 +559,7 @@ def is_spam(request, post):
         content = post.content
 
         # for link assets, lets include the link too
-        if isinstance(post, typepad.LinkAsset):
+        if isinstance(post, typepad.Link):
             content += "\n" + post.target_url
 
         # TPAS seems to rate empty posts as spam; since some asset types

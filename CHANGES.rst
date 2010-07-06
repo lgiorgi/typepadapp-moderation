@@ -1,8 +1,8 @@
 typepadapp-moderation Changelog
 ===============================
 
-Unreleased
-----------
+1.2 (tbd)
+---------
 
 * Added views for listing users with a pre-moderation, blocked status.
 * Now displaying a reason for why a user has been given a pre-moderation or blocked status.
