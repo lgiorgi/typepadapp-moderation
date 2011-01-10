@@ -50,13 +50,13 @@ def moderate(request):
     Moderation actions for the moderation queue. Approve or delete. Return OK.
     """
 
-    if not hasattr(request, 'typepad_user'):
+    if not hasattr(request, 'user'):
         typepad.client.batch_request()
-        request.typepad_user = get_user(request)
+        request.user = get_user(request)
         typepad.client.complete_batch()
 
-    if not (request.typepad_user.is_authenticated() and \
-        request.typepad_user.is_superuser):
+    if not (request.user.is_authenticated() and \
+        request.user.is_superuser):
         return http.HttpResponseForbidden()
 
     res = 'OK'
