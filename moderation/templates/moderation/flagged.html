@@ -50,13 +50,13 @@
     </tr>
     {% endfor %}
 
-    <tr id="itemss-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
+    <tr id="items-empty" class="item" {% if assets %}style="display: none;"{% endif %}>
         <td class="info" colspan="3">
             {% trans "There are no flagged posts awaiting moderation." %}
         </td>
     </tr>
 
-    <tr id="itemss-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
+    <tr id="items-footer" class="footer" {% if not assets %}style="display: none;"{% endif %}>
         <td class="item-checkbox">
             <input type="checkbox" class="check-all" />
         </td>
