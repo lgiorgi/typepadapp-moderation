@@ -176,21 +176,25 @@ class Queue(models.Model):
             typepad.client.add_credentials(oauth_client.consumer,
                 token, domain=backend[1])
 
-            # TODO: check for fail
-            if self.asset_type == 'comment':
-                typepad.client.batch_request()
-                post = tp_models.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
-                typepad.client.complete_batch()
-                post.comments.post(tp_asset)
-                signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP, parent=post)
-            else:
-                if content.attachment.name:
-                    tp_asset.save(group=tp_models.GROUP, file=content.attachment)
+            post_success = False
+            try:
+                if self.asset_type == 'comment':
+                    typepad.client.batch_request()
+                    post = tp_models.Asset.get_by_url_id(tp_asset.in_reply_to.url_id)
+                    typepad.client.complete_batch()
+                    post.comments.post(tp_asset)
+                    post_success = True
+                    signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP, parent=post)
                 else:
-                    tp_asset.save(group=tp_models.GROUP)
-                signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP)
-
-            self.delete()
+                    if content.attachment.name:
+                        tp_asset.save(group=tp_models.GROUP, file=content.attachment)
+                    else:
+                        tp_asset.save(group=tp_models.GROUP)
+                    post_success = True
+                    signals.asset_created.send(sender=self.approve, instance=tp_asset, group=tp_models.GROUP)
+            finally:
+                if post_success:
+                    self.delete()
 
 
 class QueueContent(models.Model):
