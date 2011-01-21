@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2009-2010 Six Apart Ltd.
+# Copyright (c) 2009-2011 Six Apart Ltd.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ except Exception:
 
 setup(
     name='typepadapp-moderation',
-    version='1.0.3',
+    version='1.1',
     description='Moderation panel for TypePad applications.',
     long_description=long_description,
     author='Six Apart',

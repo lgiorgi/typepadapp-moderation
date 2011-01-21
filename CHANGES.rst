@@ -1,16 +1,11 @@
 typepadapp-moderation Changelog
 ===============================
 
-Unreleased
-----------
+1.1 (2011-1-20)
+-----------------
 
 * Added views for listing users with a pre-moderation, blocked status.
 * Now displaying a reason for why a user has been given a pre-moderation or blocked status.
-
-
-1.1a1 (2010-1-20)
------------------
-
 * Added keyword moderation support.
 * Added new user probation feature.
 * Added post throttle support.
