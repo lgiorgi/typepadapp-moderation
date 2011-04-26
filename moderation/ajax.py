@@ -101,7 +101,8 @@ def moderate(request):
                 if queue.user_id not in ban_list:
                     # also ban this user
                     typepad.client.batch_request()
-                    user_memberships = User.get_by_url_id(queue.user_id).memberships.filter(by_group=request.group)
+                    user = User.get_by_url_id(queue.user_id);
+                    user_memberships = user.memberships.filter(by_group=request.group)
                     typepad.client.complete_batch()
 
                     user_membership = user_memberships[0]
@@ -113,7 +114,7 @@ def moderate(request):
 
                     try:
                         user_membership.block()
-                        signals.member_banned.send(sender=moderate,
+                        signals.member_banned.send(sender=moderate,instance=user,
                             membership=user_membership, group=request.group)
                         ban_list.append(queue.user_id)
 
@@ -193,7 +194,8 @@ def moderate(request):
 
         elif action == 'ban_user':
             typepad.client.batch_request()
-            user_memberships = User.get_by_url_id(item_id).memberships.filter(by_group=request.group)
+            user = User.get_by_url_id(item_id);
+            user_memberships = user.memberships.filter(by_group=request.group)
             typepad.client.complete_batch()
 
             try:
@@ -205,7 +207,7 @@ def moderate(request):
                     continue
 
                 user_membership.block()
-                signals.member_banned.send(sender=moderate,
+                signals.member_banned.send(sender=moderate,instance=user,
                     membership=user_membership, group=request.group)
                 ban_list.append(item_id)
 
